@@ -43,7 +43,7 @@ export default function ProfileDropdown() {
           </div>
 
 
-          <Link
+          {/* <Link
             href="/watchlist"
             className="flex justify-center  gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
             onClick={() => setIsOpen(false)}
@@ -61,7 +61,7 @@ export default function ProfileDropdown() {
             <Settings size={16} /> การตั้งค่า
           </Link>
 
-          <div className="h-px bg-gray-100 my-1" />
+          <div className="h-px bg-gray-100 my-1" /> */}
 
           <button
             className="w-full flex justify-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors text-left"

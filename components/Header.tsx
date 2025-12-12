@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect, } from 'react';
+import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { Menu, Search, Bell, UserCircle, Moon, Sun, User, Settings, LogOut} from 'lucide-react';
@@ -43,18 +44,21 @@ export default function Header() {
         </button>
 
         {/* App logo */}
-        <div className="flex items-center gap-2 text-black">
-          <Image
-            src="/logos/KIdeaSLogo.png"
-            alt="KIdeaS Logo"
-            width={32}
-            height={32}
-            className="w-10 h-10 object-contain" 
-          />
-          <span className="text-xl font-bold tracking-tight hidden sm:block">
-            KIdeaS
-          </span>
-        </div>
+        <Link href='/' className="flex items-center">
+          <div className="flex items-center gap-2 text-black">
+            <Image
+              src="/logos/KIdeaSLogo.png"
+              alt="KIdeaS Logo"
+              width={32}
+              height={32}
+              className="w-10 h-10 object-contain" 
+            />
+            <span className="text-xl font-bold tracking-tight hidden sm:block">
+              KIdeaS
+            </span>
+          </div>
+        </Link>
+
       </div>
 
       {/* Search bar: จะถูกซ่อนตอนหน้าจอบีบ */}

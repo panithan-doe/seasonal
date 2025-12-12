@@ -24,7 +24,10 @@ export default async function StockDetail({ params }: PageProps) {
   return (
     <main>
       <Header />
+
       <div className="min-h-screen bg-gray-50 p-6 md:p-12">
+        <h1 className="text-4xl font-bold text-gray-400">stock details page (unfinished)</h1>
+
         <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-sm p-8">
           {/* Header Section */}
           <div className="border-b pb-6 mb-6">
