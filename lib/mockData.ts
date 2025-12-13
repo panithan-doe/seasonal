@@ -1,11 +1,11 @@
 // Mock data for seasonal stocks
 export const seasonalStocks = [
-  { symbol: 'AAPL', name: 'Apple Inc.', price: 173.50, changePercent: 1.25, category: '💻 เทคโนโลยี', isWatchlist: true },
-  { symbol: 'TSLA', name: 'Tesla Motors', price: 210.00, changePercent: 2.40, category: '🚗 ยานยนต์', isWatchlist: false  },
-  { symbol: 'AMZN', name: 'Amazon.com', price: 128.90, changePercent: 0.85, category: '🛒 อีคอมเมิร์ซ', isWatchlist: false  },
-  { symbol: 'GOOGL', name: 'Alphabet Inc.', price: 135.20, changePercent: 0.50, category: '💻 เทคโนโลยี', isWatchlist: false  },
-  { symbol: 'MSFT', name: 'Microsoft Corp', price: 312.80, changePercent: 1.10, category: '💻 เทคโนโลยี', isWatchlist: true  },
-  { symbol: 'NVDA', name: 'Nvidia Corp', price: 420.69, changePercent: 3.50, category: '💻 เทคโนโลยี', isWatchlist: false  },
+  { symbol: 'AAPL', name: 'Apple Inc.', price: 173.50, changePercent: 1.25, category: '💻 เทคโนโลยี', percentLoss: 1, isWatchlist: true },
+  { symbol: 'TSLA', name: 'Tesla Motors', price: 210.00, changePercent: 2.40, category: '🚗 ยานยนต์', percentLoss: 6, isWatchlist: false  },
+  { symbol: 'AMZN', name: 'Amazon.com', price: 128.90, changePercent: 0.85, category: '🛒 อีคอมเมิร์ซ', percentLoss: 3, isWatchlist: false  },
+  { symbol: 'GOOGL', name: 'Alphabet Inc.', price: 135.20, changePercent: 0.50, category: '💻 เทคโนโลยี', percentLoss: 6, isWatchlist: false  },
+  { symbol: 'MSFT', name: 'Microsoft Corp', price: 312.80, changePercent: 1.10, category: '💻 เทคโนโลยี', percentLoss: 5, isWatchlist: true  },
+  { symbol: 'NVDA', name: 'Nvidia Corp', price: 420.69, changePercent: 3.50, category: '💻 เทคโนโลยี', percentLoss: 4, isWatchlist: false  },
 ];
 
 // Mock data for news

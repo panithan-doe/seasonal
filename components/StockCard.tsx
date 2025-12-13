@@ -1,5 +1,10 @@
+"use client";
+
+import { useState } from 'react';
 import Link from 'next/link';
 import { Star, TrendingUp } from 'lucide-react'
+import { percent } from 'framer-motion';
+import { useToast } from '@/context/ToastContext';
 
 interface StockProps {
   stock: {
@@ -8,19 +13,46 @@ interface StockProps {
     price: number;
     changePercent: number;
     category?: string;
+    percentLoss: number;
     isWatchlist: boolean;    
   };
 }
 
 const StockCard = ({ stock }: StockProps) => {
+  
+  const [isWatchlist, setIsWatchlist] = useState(stock.isWatchlist)
 
   const isPositive = stock.changePercent >= 0;  // green for POSITIVE, red for NEGATIVE
   const trendColor = isPositive ? 'text-green-600' : 'text-red-600';
   const trendSign = isPositive ? '+' : '';
-  const isWatchlistColor = stock.isWatchlist ? 'text-[#ecc353]' : 'text-gray-300';
+  const isWatchlistColor = isWatchlist ? 'text-[#ecc353]' : 'text-gray-300';
   const priceChange = (stock.price * stock.changePercent) / 100;
   const growthPeriod = "กรกฏาคม-กันยายน"; // Need to change
+  const { showToast } = useToast();
+
+  // NOTE: percent loss ยังไม่รู้ว่าคำนวณจากอะไร
+  const lossColor = stock.percentLoss <= 5 ? 'text-green-600' : 'text-yellow-600';
+
+
+  const handleToggleWatchlist = (e: React.MouseEvent) => {
+    e.preventDefault(); // ป้องกันไม่ให้ลิงก์ทำงาน
+    e.stopPropagation(); // ป้องกันไม่ให้เหตุการณ์ฟองสบู่ขึ้นไปยังองค์ประกอบพาเรนต์
+    
+    const newState = !isWatchlist;
+    setIsWatchlist(newState);
+
+    if (newState) {
+      showToast(`${stock.symbol} ถูกเพิ่มใน Watchlist`, "success");
+    } else {
+      showToast(`${stock.symbol} ถูกลบออกจาก Watchlist`, "error");
+    }
   
+    // TODO: Real API call to update watchlist status
+    // ...
+
+  }
+
+
   return (
     <Link href={`/stock/${stock.symbol}`} className="block h-full">
       <div className="
@@ -43,12 +75,17 @@ const StockCard = ({ stock }: StockProps) => {
           <h4 className='text-xs text-gray-400'>{stock.category}</h4>
           <div className='flex justify-between w-full items-center mb-2'>
             <h3 className="text-lg font-bold text-gray-900">{stock.symbol}</h3>
-            <Star
-              className={isWatchlistColor}
-              fill="currentColor"
-              strokeWidth={0.1}
-            />
-            {/* <p className="text-sm text-gray-500 line-clamp-1">{stock.name}</p> */}
+            
+            <button
+              onClick={handleToggleWatchlist}
+              className="p-1 rounded-full hover:bg-gray-100 transition-colors focus:outline-none z-10"            >
+              <Star
+                className={isWatchlistColor}
+                fill="currentColor"
+                strokeWidth={0.1}
+              />
+            </button>
+
           </div>
         </div>
 
@@ -64,18 +101,30 @@ const StockCard = ({ stock }: StockProps) => {
               </span>
             </div>
 
-            {/* Change */}
-            <div className='flex flex-col gap-2'>
+            {/* Change & Loss */}
+            <div className='flex flex-col items-end gap-2'>
               <h4 className="text-xs font-extrabold text-gray-400">เปลี่ยนแปลงจากวันที่แนะนำ</h4>
               <div className={`flex items-center mt-1 gap-1 text-sm font-semibold ${trendColor}`}>
                 <TrendingUp/>
                 <span>
                   {trendSign}{priceChange.toFixed(2)}
                 </span>
-                <span className="ml-1 text-2xs font-normal">
+                <span>
                   ({trendSign}{stock.changePercent.toFixed(2)}%)
                 </span>
               </div>
+
+              {/* Percent Loss */}
+              
+              <div className={`flex items-center rounded-4xl gap-1 text-sm 
+                ${stock.percentLoss <= 5 ? 'bg-green-100 p-0.5 px-3 text-green-500' : 'bg-yellow-100 p-0.5 px-3 text-yellow-500'}`
+              }>
+                <span>
+                  loss {stock.percentLoss}%
+                </span>
+              </div>
+
+
             </div>
           </div>
 
