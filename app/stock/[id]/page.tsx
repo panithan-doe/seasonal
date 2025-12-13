@@ -80,8 +80,9 @@ export default async function StockDetail({ params }: PageProps) {
         </div>
 
         
-        <StockChart />
-
+        {/* <StockChart /> */}
+        {/* Parse symbol */}
+        <StockChart symbol={stock.symbol} />
         
       </div>
     </main>
