@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 // ลบ X ออกจาก import เพราะไม่ใช้แล้ว
-import { Menu, Search, Bell, Moon, Sun } from 'lucide-react'; 
+import { Menu, Search, Bell, Moon, Sun, X } from 'lucide-react'; 
 import ProfileDropdown from '@/components/ProfileDropdown';
 import Sidebar from '@/components/SideBar';
 
@@ -26,18 +26,15 @@ export default function Header() {
   // Search state
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   
-  // ✅ 1. เพิ่ม Ref สำหรับ Search bar เพื่อใช้เช็คการกดข้างนอก
   const searchRef = useRef<HTMLDivElement>(null);
 
   { /* Handle click outside */ }
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      // Logic เดิมของ Profile Dropdown
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
       
-      // ✅ 2. เพิ่ม Logic สำหรับ Search: ถ้าคลิกนอกพื้นที่ Search ให้ปิด
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
         setIsSearchOpen(false);
       }
@@ -77,34 +74,44 @@ export default function Header() {
           </Link>
         </div>
 
-        {/* ✅ Middle Section: Search Bar (ปรับแก้) */}
-        {/* ใช้ flex-1 เพื่อกินพื้นที่ว่าง และ justify-end เพื่อดันไปขวาสุด */}
         <div className="flex flex-1 justify-end items-center mr-2" ref={searchRef}>
           
-          {isSearchOpen ? (
-            // 🟢 สถานะ OPEN: Input Bar
-            // กำหนด max-w เพื่อไม่ให้ยาวเกินไปจนชน Logo ฝั่งซ้าย
-            <div className="relative w-full max-w-[200px] md:max-w-md text-gray-500 focus-within:text-blue-600">
-              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                <Search className="w-5 h-5" />
+          <div className="flex items-center gap-2"> 
+            
+            {isSearchOpen && (
+              <div className="relative w-full min-w-100 md:w-6"> 
+                <input
+                  autoFocus
+                  type="text"
+                  className="block w-full py-1.5 px-4 text-sm text-gray-900 border border-gray-300 rounded-full bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
+                  placeholder="ค้นหา..."
+                />
               </div>
-              <input
-                autoFocus
-                type="text"
-                className="block w-full p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
-                placeholder="ค้นหา..."
-              />
-              {/* ❌ ลบปุ่ม X ออกแล้ว ตามต้องการ */}
-            </div>
-          ) : (
-            // 🔴 สถานะ CLOSED: ปุ่มแว่นขยาย
+            )}
+
+            {/* Toggle Button: แสดงตลอดเวลา */}
             <button 
-              onClick={() => setIsSearchOpen(true)}
-              className="p-2 text-gray-500 rounded-full hover:bg-gray-100 transition"
+              onClick={() => setIsSearchOpen(!isSearchOpen)}
+              // className={`px-3 py-1.5 text-white rounded-full transition cursor-pointer flex items-center justify-center mr-2
+              //   ${isSearchOpen 
+              //     ? "bg-gray-400 hover:bg-gray-500" 
+              //     : "bg-[#527AFC] hover:bg-[#436bf1]"
+              //   }
+              // `}
+              className={`px-3 py-1.5 text-white rounded-full transition cursor-pointer flex items-center justify-center mr-2
+                ${isSearchOpen
+                  ? "bg-[#436bf1]"
+                  : "bg-[#527AFC] hover:bg-[#436bf1]"
+                }
+                
+              `}
             >
-              <Search className="w-6 h-6" />
+              {/* {isSearchOpen ? <X className="w-5 h-5" /> : <Search className="w-5 h-5" />} */}
+              <Search className="w-5 h-5" />
+            
             </button>
-          )}
+
+          </div>
 
         </div>
 
@@ -126,17 +133,19 @@ export default function Header() {
               transition={spring}
               animate={{ 
                 x: isDarkMode ? 32 : 0,
-                backgroundColor: isDarkMode ? "#527AFC" : "#527AFC" 
+                // backgroundColor: isDarkMode ? "#527AFC" : "#527AFC" 
+                backgroundColor: "#527AFC"
+
               }}
             >
               {isDarkMode ? <Moon size={12} className="text-white"/> : <Sun size={12} className="text-white"/>}
             </motion.div>
           </div>
 
-          <button className="relative p-2 text-gray-500 rounded-full hover:bg-gray-100 transition">
+          {/* <button className="relative p-2 text-gray-500 rounded-full hover:bg-gray-100 transition">
             <Bell className="w-6 h-6" />
             <span className="hidden absolute top-1.5 right-2 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
-          </button>
+          </button> */}
 
           <ProfileDropdown />
 
