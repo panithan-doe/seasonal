@@ -15,11 +15,12 @@ export default function Home() {
         {/* Seasonal Section */}
         <section className="max-w-7xl mx-auto mb-16">
           <div className="flex justify-start items-end mb-6 text-[#247AE0]">
-            <h2 className="text-2xl font-bold mr-1">แนะนำหุ้น</h2>
-            <span className="text-md pb-0.5">({seasonalStocks.length})</span>
+            <h2 className="text-xl font-bold mr-1">Season Stock</h2>
+            <span className="text-sm pb-0.5">({seasonalStocks.length})</span>
           </div>
 
-          
+          {/* <hr className="mb-4"/> */}
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {seasonalStocks.map((stock) => (
               <StockCard key={stock.symbol} stock={stock} />
@@ -27,13 +28,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* News Section */}
-        <section className="max-w-7xl mx-auto">
-          <h2 className="text-2xl font-bold text-[#247AE0] mb-4">
-            ข่าวสารหุ้น
-          </h2>
-          <NewsTable news={marketNews} />
-        </section>
+        
       </div>
     </main>
   );
