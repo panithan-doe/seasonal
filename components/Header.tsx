@@ -4,7 +4,8 @@ import { useState, useRef, useEffect, } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Menu, Search, Bell, UserCircle, Moon, Sun, User, Settings, LogOut} from 'lucide-react';
+// ลบ X ออกจาก import เพราะไม่ใช้แล้ว
+import { Menu, Search, Bell, Moon, Sun, X } from 'lucide-react'; 
 import ProfileDropdown from '@/components/ProfileDropdown';
 import Sidebar from '@/components/SideBar';
 
@@ -21,12 +22,21 @@ export default function Header() {
 
   // Sidebar state
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  
+  // Search state
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  
+  const searchRef = useRef<HTMLDivElement>(null);
 
-  { /* Handle click outside */}
+  { /* Handle click outside */ }
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsOpen(false);
+      }
+      
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setIsSearchOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -38,18 +48,16 @@ export default function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 flex items-center justify-between w-full h-16 px-4 bg-white border-b border-gray-200 shadow-sm">
+      <header className="sticky top-0 z-50 h-24 flex items-center justify-between w-full px-4 bg-white border-b border-gray-200 shadow-sm">
         
+        {/* Left Section: Menu & Logo */}
         <div className="flex items-center gap-3">
-
-          {/* Menu button */}
           <button 
             onClick={() => setIsSidebarOpen(true)}
             className="p-2 text-gray-600 rounded-lg hover:bg-gray-100 transition">
             <Menu className="w-6 h-6" />
           </button>
 
-          {/* App logo */}
           <Link href='/' className="flex items-center">
             <div className="flex items-center gap-2 text-black">
               <Image
@@ -64,64 +72,81 @@ export default function Header() {
               </span>
             </div>
           </Link>
-
         </div>
 
-        {/* Search bar: จะถูกซ่อนตอนหน้าจอบีบ */}
-        <div className="hidden md:flex flex-1 max-w-md mx-6">
-          <div className="relative w-full text-gray-500 focus-within:text-blue-600">
-            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+        <div className="flex flex-1 justify-end items-center mr-2" ref={searchRef}>
+          
+          <div className="flex items-center gap-2"> 
+            
+            {isSearchOpen && (
+              <div className="relative w-full min-w-100 md:w-6"> 
+                <input
+                  autoFocus
+                  type="text"
+                  className="block w-full py-1.5 px-4 text-sm text-gray-900 border border-gray-300 rounded-full bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
+                  placeholder="ค้นหา..."
+                />
+              </div>
+            )}
+
+            {/* Toggle Button: แสดงตลอดเวลา */}
+            <button 
+              onClick={() => setIsSearchOpen(!isSearchOpen)}
+              // className={`px-3 py-1.5 text-white rounded-full transition cursor-pointer flex items-center justify-center mr-2
+              //   ${isSearchOpen 
+              //     ? "bg-gray-400 hover:bg-gray-500" 
+              //     : "bg-[#527AFC] hover:bg-[#436bf1]"
+              //   }
+              // `}
+              className={`px-3 py-1.5 text-white rounded-full transition cursor-pointer flex items-center justify-center mr-2
+                ${isSearchOpen
+                  ? "bg-[#436bf1]"
+                  : "bg-[#527AFC] hover:bg-[#436bf1]"
+                }
+                
+              `}
+            >
+              {/* {isSearchOpen ? <X className="w-5 h-5" /> : <Search className="w-5 h-5" />} */}
               <Search className="w-5 h-5" />
-            </div>
-            <input
-              type="text"
-              className="block w-full p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all"
-              placeholder="ค้นหา..."
-            />
+            
+            </button>
+
           </div>
+
         </div>
 
         {/* Actions Section */}
         <div className="flex items-center gap-2 sm:gap-3">
-          
-          {/* Search icon: จะแสดงตอนหน้าจอขยาย */}
-          <button className="p-2 md:hidden text-gray-500 rounded-full hover:bg-gray-100">
-            <Search className="w-6 h-6" />
-          </button>
 
-          {/* Theme Toggle */}
           <div
             className={`relative flex h-8 w-16 cursor-pointer items-center rounded-full p-1 transition-colors duration-300 ${
               isDarkMode ? "bg-gray-600" : "bg-gray-300"
             }`}
             onClick={toggleTheme}
           >
-            {/* Icon LIGHT (ซ้าย), DARK (ขวา) */}
             <div className="absolute right-2 text-white"><Moon size={14} /></div>
             <div className="absolute left-2 text-white"><Sun size={14} /></div>
 
-            {/* ปุ่มวงกลมเลื่อน */}
             <motion.div
               className="z-10 flex h-6 w-6 items-center justify-center rounded-full bg-white shadow-sm"
               layout
               transition={spring}
               animate={{ 
                 x: isDarkMode ? 32 : 0,
-                backgroundColor: isDarkMode ? "#527AFC" : "#527AFC" 
+                // backgroundColor: isDarkMode ? "#527AFC" : "#527AFC" 
+                backgroundColor: "#527AFC"
+
               }}
             >
               {isDarkMode ? <Moon size={12} className="text-white"/> : <Sun size={12} className="text-white"/>}
             </motion.div>
           </div>
 
-          {/* Noti */}
-          <button className="relative p-2 text-gray-500 rounded-full hover:bg-gray-100 transition">
+          {/* <button className="relative p-2 text-gray-500 rounded-full hover:bg-gray-100 transition">
             <Bell className="w-6 h-6" />
-            {/* จุดแดง */}
             <span className="hidden absolute top-1.5 right-2 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
-          </button>
+          </button> */}
 
-          {/* Profile Dropdown */}
           <ProfileDropdown />
 
         </div>

@@ -1,16 +1,16 @@
 // Mock data for stock
 export const seasonalStocks = [
-  { symbol: 'AAPL', name: 'Apple Inc.', price: 173.50, changePercent: 1.25, category: '💻 เทคโนโลยี', percentLoss: 1, isWatchlist: true },
-  { symbol: 'TSLA', name: 'Tesla Motors', price: 210.00, changePercent: 2.40, category: '🚗 ยานยนต์', percentLoss: 6, isWatchlist: false  },
-  { symbol: 'AMZN', name: 'Amazon.com', price: 128.90, changePercent: 0.85, category: '🛒 อีคอมเมิร์ซ', percentLoss: 3, isWatchlist: false  },
-  { symbol: 'GOOGL', name: 'Alphabet Inc.', price: 135.20, changePercent: 0.50, category: '💻 เทคโนโลยี', percentLoss: 6, isWatchlist: false  },
-  { symbol: 'MSFT', name: 'Microsoft Corp', price: 312.80, changePercent: 1.10, category: '💻 เทคโนโลยี', percentLoss: 5, isWatchlist: true  },
-  { symbol: 'NVDA', name: 'Nvidia Corp', price: 420.69, changePercent: 3.50, category: '💻 เทคโนโลยี', percentLoss: 4, isWatchlist: false  },
+  { symbol: 'AAPL', name: 'Apple Inc.', price: 173.50, changePercent: 1.25, category: 'เทคโนโลยี', percentLoss: 1, isWatchlist: true },
+  { symbol: 'TSLA', name: 'Tesla Motors', price: 210.00, changePercent: 2.40, category: 'ยานยนต์', percentLoss: 6, isWatchlist: false  },
+  { symbol: 'AMZN', name: 'Amazon.com', price: 128.90, changePercent: 0.85, category: 'อีคอมเมิร์ซ', percentLoss: 3, isWatchlist: false  },
+  { symbol: 'GOOGL', name: 'Alphabet Inc.', price: 135.20, changePercent: 0.50, category: 'เทคโนโลยี', percentLoss: 6, isWatchlist: false  },
+  { symbol: 'MSFT', name: 'Microsoft Corp', price: 312.80, changePercent: 1.10, category: 'เทคโนโลยี', percentLoss: 5, isWatchlist: true  },
+  { symbol: 'NVDA', name: 'Nvidia Corp', price: 420.69, changePercent: 3.50, category: 'เทคโนโลยี', percentLoss: 4, isWatchlist: false  },
   
   // Thai stock (.BK)
-  { symbol: 'PTT.BK', name: 'PTT Public Company Limited', price: 34.00, changePercent: -0.50, category: '🛢️ พลังงาน', percentLoss: 2, isWatchlist: false },
-  { symbol: 'AOT.BK', name: 'Airports of Thailand', price: 60.00, changePercent: 1.20, category: '✈️ ขนส่ง', percentLoss: 1, isWatchlist: true },
-  { symbol: 'DELTA.BK', name: 'Delta Electronics', price: 85.00, changePercent: 5.50, category: '🔌 ชิ้นส่วนอิเล็กฯ', percentLoss: 8, isWatchlist: false },
+  { symbol: 'PTT.BK', name: 'PTT Public Company Limited', price: 34.00, changePercent: -0.50, category: 'พลังงาน', percentLoss: 2, isWatchlist: false },
+  { symbol: 'AOT.BK', name: 'Airports of Thailand', price: 60.00, changePercent: 1.20, category: 'ขนส่ง', percentLoss: 1, isWatchlist: true },
+  { symbol: 'DELTA.BK', name: 'Delta Electronics', price: 85.00, changePercent: 5.50, category: 'ชิ้นส่วนอิเล็กฯ', percentLoss: 8, isWatchlist: false },
 ];
 
 // Mock data for news
