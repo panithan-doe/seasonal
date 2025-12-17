@@ -29,13 +29,15 @@ export default function Home() {
             <span className="text-md pb-0.5">({displayedStocks.length})</span>
           </div>
 
-          <Link 
-            href="/seasonstock" 
-            className="group flex items-center justify-end text-sm font-semibold text-[#247AE0] hover:text-blue-700 transition-colors mb-4"
-          >
-            ดูทั้งหมด ({seasonalStocks.length})
-            <ArrowRight className="ml-1 w-4 h-4 transition-transform group-hover:translate-x-1" />
-          </Link>
+          <div className="flex items-center justify-end text-sm font-semibold mb-4">
+            <Link 
+              href="/seasonstock" 
+              className="flex items-center text-sm font-semibold text-[#247AE0] hover:text-blue-700 transition mb-4"
+            >
+              แสดงทั้งหมด
+              <ArrowRight className="ml-1 w-4 h-4 transition-transform group-hover:translate-x-1" />
+            </Link>
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {displayedStocks.map((stock) => (

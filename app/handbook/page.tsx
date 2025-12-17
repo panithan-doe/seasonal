@@ -1,9 +1,19 @@
+import Header from '@/components/Header';
+import QuarterHeader from '@/components/QuarterHeader';
+
 export default function NewsPage() {
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gray-50">
-      <h1 className="text-3xl font-bold text-gray-400 uppercase tracking-widest">
-        Handbook Page
-      </h1>
-    </div>
+    <main>
+      <Header/>
+      
+      <QuarterHeader/>
+      
+      <div className="min-h-screen bg-gray-50 p-6 md:p-12 flex justify-center items-center">
+        <p className='text-gray-800'>
+          handbook page
+        </p>
+      </div>
+      
+    </main>
   );
 }

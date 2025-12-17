@@ -116,13 +116,13 @@ const StockCard = ({ stock }: StockProps) => {
 
               {/* Percent Loss */}
               
-              <div className={`flex items-center rounded-4xl gap-1 text-sm 
+              {/* <div className={`flex items-center rounded-4xl gap-1 text-sm 
                 ${stock.percentLoss <= 5 ? 'bg-green-100 p-0.5 px-3 text-green-500' : 'bg-yellow-100 p-0.5 px-3 text-yellow-500'}`
               }>
                 <span>
                   loss {stock.percentLoss}%
                 </span>
-              </div>
+              </div> */}
 
 
             </div>
