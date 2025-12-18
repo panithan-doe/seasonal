@@ -2,7 +2,23 @@ import { seasonalStocks } from "@/lib/mockData";
 import { notFound } from "next/navigation";
 import Header from "@/components/Header";
 import StockChart from "@/components/StockChart";
-import { getStockData } from "@/lib/services/stock"; 
+import { div } from "framer-motion/client";
+
+
+async function getStockHistory(symbol: string) {
+  try {
+    // TODO: เปลี่ยนเป็น Production URL Domain
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/stock/history?symbol=${symbol}&range=1M`, {
+      cache: 'no-store' // ดึงใหม่ทุกครั้งเพื่อให้ได้ราคาล่าสุด
+    });
+    
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (error) {
+    console.error("Error fetching stock data:", error);
+    return null;
+  }
+}
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -49,13 +65,14 @@ export default async function StockDetail({ params }: PageProps) {
         displayChangePercent = ((displayChange / prevPrice) * 100);
 
         const dateObj = new Date(latest.date);
+        // จัดรูปแบบวันที่
         lastUpdateDate = dateObj.toLocaleDateString('th-TH', {
             year: 'numeric',
             month: 'long',
             day: 'numeric',
         });
-        
-        lastUpdateTime = `อัปเดตเวลา ${dateObj.toLocaleTimeString('th-TH', {
+        // จัดรูปแบบเวลา
+        lastUpdateTime = `${dateObj.toLocaleTimeString('th-TH', {
             hour: '2-digit',
             minute: '2-digit',
         })} น.`;
@@ -106,14 +123,23 @@ export default async function StockDetail({ params }: PageProps) {
               </div>
             </div>
 
-            <div className="flex flex-col items-start md:items-end mt-4 md:mt-0">
-              <p className="font-bold text-gray-700 text-lg">
-                {lastUpdateDate}
+            {/* Right div (วันที่) */}
+            <div className="flex flex-col items-start mt-4 md:mt-0">
+              <p className="font-bold text-gray-500 text-lg">
+                อัปเดตล่าสุด
               </p>
               {lastUpdateTime && (
-                <p className="text-sm text-gray-500 mt-1">
-                   {lastUpdateTime}
-                </p>
+                <div className="text-gray-500 ">
+                  <span className="text-sm mt-1">
+                    {lastUpdateTime}
+                  </span>
+                  <span className="mx-1 text-">
+                    •
+                  </span>
+                  <span className="text-sm mt-1">
+                    {lastUpdateDate}
+                  </span>
+                </div>
               )}
             </div>
 

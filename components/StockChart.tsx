@@ -162,8 +162,8 @@ export default function StockChart({ symbol, initialData = [] }: StockChartProps
               ข้อมูลตลาดหุ้น
             </h3>
             <div className="flex flex-col gap-3">
-              <RowItem label="ราคาหุ้นปัจจุบัน (THB)" value={latestPrice} />
-              <RowItem label="Market Cap (THB)" value={defaultMarketStats.marketCap} />
+              <RowItem label="ราคาหุ้นปัจจุบัน" value={latestPrice} />
+              <RowItem label="Market Cap" value={defaultMarketStats.marketCap} />
               <RowItem label="Volume" value={defaultMarketStats.volume} />
               <RowItem label="P/E" value={defaultMarketStats.pe} />
               <RowItem label="P/BV" value={defaultMarketStats.pbv} />
