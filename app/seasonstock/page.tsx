@@ -52,7 +52,7 @@ export default function SeasonStock() {
           
           {/* Header */}
           <div className="flex justify-start items-end text-[#247AE0] mb-4">
-            <h2 className="text-xl font-bold mr-1">SeasonStock</h2>
+            <h2 className="text-xl font-bold mr-1">Seasonal Stock</h2>
             <span className="text-sm pb-0.5">({filteredStocks.length})</span>
           </div>
 

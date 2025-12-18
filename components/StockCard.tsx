@@ -71,32 +71,40 @@ const StockCard = ({ stock }: StockProps) => {
       ">
         
         {/* Header */ }
-        <div className="flex flex-col items-start mb-4">
-          <h4 className='text-xs text-gray-400'>{stock.category}</h4>
-          <div className='flex justify-between w-full items-center mb-2'>
-            <h3 className="text-lg font-bold text-gray-900">{stock.symbol}</h3>
+         <div className="flex flex-row justify-between items-start mb-3">
+          <div>
             
-            <button
-              onClick={handleToggleWatchlist}
-              className="p-1 rounded-full hover:bg-gray-100 transition-colors focus:outline-none z-10"            >
-              <Star
-                className={isWatchlistColor}
-                fill="currentColor"
-                strokeWidth={0.1}
-              />
-            </button>
+            <div className='flex items-center justify-center rounded-lg bg-[#247AE0] mb-5'>
+              <span className='text-sm font-medium text-white px-4 py-1'>
+                กันยายน  {/* TODO: Change this */}
+              </span>
+            </div>
 
+            <h4 className='text-xs text-gray-400'>{stock.category}</h4>
+            <h3 className="text-3xl font-bold text-gray-900">{stock.symbol}</h3>
           </div>
+     
+          <button
+            onClick={handleToggleWatchlist}
+            className="p-1 rounded-full hover:bg-gray-100 transition-colors focus:outline-none z-10"            >
+            <Star
+              className={isWatchlistColor}
+              fill="currentColor"
+              strokeWidth={0.1}
+            />
+          </button>
         </div>
+
+
 
         {/* Body */}
         <div className='flex flex-col items-start'>
-          <div className='flex justify-between w-full items-center mb-6'>
+          <div className='flex justify-between w-full items-center mb-3'>
             
             {/* Price */}
             <div className='flex flex-col gap-2'>
               <h4 className="text-xs font-extrabold text-gray-400">ราคาปัจจุบัน</h4>
-              <span className="text-2xl font-bold text-gray-900">
+              <span className="text-xl font-bold text-[#247AE0]">
                 THB{stock.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}
               </span>
             </div>
@@ -104,12 +112,12 @@ const StockCard = ({ stock }: StockProps) => {
             {/* Change & Loss */}
             <div className='flex flex-col items-end gap-2'>
               <h4 className="text-xs font-extrabold text-gray-400">เปลี่ยนแปลงจากวันที่แนะนำ</h4>
-              <div className={`flex items-center mt-1 gap-1 text-sm font-semibold ${trendColor}`}>
+              <div className={`flex items-center mt-1 gap-1 text-xl font-semibold ${trendColor}`}>
                 <TrendingUp/>
                 <span>
                   {trendSign}{priceChange.toFixed(2)}
                 </span>
-                <span>
+                <span className='text-sm'>
                   ({trendSign}{stock.changePercent.toFixed(2)}%)
                 </span>
               </div>
@@ -128,19 +136,21 @@ const StockCard = ({ stock }: StockProps) => {
             </div>
           </div>
 
-          {/* month period growth */}
-          <div>
-            <h4 className="text-xs font-extrabold text-gray-400">เติบโตได้ดีในช่วง</h4>
-            <h4 className="text-xs font-extrabold text-gray-400">{growthPeriod}</h4>        {/* Need to change*/}
-          </div>
+          <div className='flex flex-row w-full justify-between items-end'>
+            {/* เติบโตได้ดีในช่วง */}
+            <div>
+              <h4 className="text-xs font-extrabold text-gray-400">เติบโตได้ดีในช่วง</h4>
+              <h4 className="text-xs font-extrabold text-gray-400">{growthPeriod}</h4>        {/* Need to change*/}
+            </div>
 
-          {/* Button */}
-          <div className='flex justify-end w-full'>
-            <button className='flex items-center mt-2 px-4 py-1 bg-[#1f40af] rounded-lg hover:bg-blue-600 transition cursor-pointer '>
-              <span className="text-xs font-medium text-white">ดูรายละเอียด</span>
-            </button>
+            {/* Button */}
+            <div>
+              <button className='flex items-center mt-2 px-3 py-2 bg-[#247AE0] rounded-lg hover:bg-blue-600 transition cursor-pointer '>
+                <span className="text-sm font-medium text-white px-5">ดูรายละเอียด</span>
+              </button>
+            </div>
           </div>
-        
+          
           
           
         </div>

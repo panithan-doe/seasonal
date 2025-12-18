@@ -96,7 +96,7 @@ export default async function StockDetail({ params }: PageProps) {
           <h1 className="text-[#4285F4] font-extrabold text-xl">ภาพรวมหุ้น</h1>
         </div>
         {/* Price Section */}
-        <div className="bg-white rounded-xl shadow-sm p-8">
+        <div className="bg-white rounded-xl shadow-md p-8 shadow-[#247AE0]">
           <div className="flex flex-col md:justify-between md:flex-row md:items-start">
             
             {/* Left div */}
