@@ -22,7 +22,7 @@ export default function SeasonStock() {
 
   const filteredStocks = useMemo(() => {
     return seasonalStocks.filter((stock) => {
-      // กรองตามชื่อหรือสัญลักษณ์ (Case insensitive)
+      // กรองตามชื่อหรือ symbol
       const matchesSearch = 
         stock.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
         stock.name.toLowerCase().includes(searchQuery.toLowerCase());
@@ -52,7 +52,7 @@ export default function SeasonStock() {
           
           {/* Header */}
           <div className="flex justify-start items-end text-[#247AE0] mb-4">
-            <h2 className="text-xl font-bold mr-1">Season Stock</h2>
+            <h2 className="text-xl font-bold mr-1">SeasonStock</h2>
             <span className="text-sm pb-0.5">({filteredStocks.length})</span>
           </div>
 
@@ -75,7 +75,6 @@ export default function SeasonStock() {
             {/* Filter Group */}
             <div className="flex gap-2 w-full md:w-auto justify-end"> {/* justify-end เพื่อให้ชิดขวาเสมอ */}
               
-              {/* 2. แทนที่ Category Dropdown เดิม */}
               <FilterDropdown
                 options={categories}
                 value={selectedCategory}
@@ -83,7 +82,6 @@ export default function SeasonStock() {
                 placeholder="หมวดธุรกิจ"
               />
 
-              {/* 3. แทนที่ Country Dropdown เดิม */}
               <FilterDropdown
                 options={countries}
                 value={selectedCountry}

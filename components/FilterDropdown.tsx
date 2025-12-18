@@ -1,4 +1,3 @@
-// src/components/ui/CustomDropdown.tsx
 "use client";
 
 import { useState, useRef, useEffect } from "react";
@@ -11,7 +10,7 @@ interface CustomDropdownProps {
   placeholder?: string;
 }
 
-export default function CustomDropdown({
+export default function FilterDropdown({
   options,
   value,
   onChange,
@@ -42,7 +41,7 @@ export default function CustomDropdown({
 
   return (
     <div className="relative w-full md:w-48" ref={dropdownRef}>
-      {/* Trigger Button (ส่วนที่แสดงผลตอนยังไม่กด) */}
+      {/* Trigger Button */}
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
@@ -60,12 +59,12 @@ export default function CustomDropdown({
         />
       </button>
 
-      {/* Dropdown Menu (รายการที่จะโผล่ออกมา) */}
+      {/* Dropdown Menu */}
       {isOpen && (
         <div className="absolute z-50 mt-2 w-full bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden py-2">
           <div className="max-h-64 overflow-y-auto">
             {options.map((option) => {
-               // Logic การแสดงผลชื่อใน list (แปลง All เป็นชื่อที่เข้าใจง่าย)
+               
                let displayName = option;
                if (option === "All") {
                  displayName = placeholder.includes("หมวด") ? "ทุกหมวดหมู่" : "ทุกประเทศ";

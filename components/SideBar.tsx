@@ -19,13 +19,13 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
     { name: "SeasonStock", href: "/seasonstock", icon: PieChart },
     { name: "ข่าว", href: "/news", icon: Newspaper },
     { name: "Watchlist", href: "/watchlist", icon: Star },
-    { name: "คู่มือ & ความรู้การลงทุน", href: "/handbook", icon: Star },
+    { name: "คู่มือ", href: "/handbook", icon: Star },
   ];
 
-  const bottomItems = [
-    { name: "ตั้งค่า", href: "/settings", icon: Settings },
-    { name: "ช่วยเหลือ", href: "/help", icon: HelpCircle },
-  ];
+  // const bottomItems = [
+  //   { name: "ตั้งค่า", href: "/settings", icon: Settings },
+  //   { name: "ช่วยเหลือ", href: "/help", icon: HelpCircle },
+  // ];
 
   if (!isOpen) return null;
 
