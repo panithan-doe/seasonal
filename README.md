@@ -6,7 +6,7 @@
 
 2. เปิด terminal ใน VSCode 
 3. run คำสั่งตามลำดับ
-   1. `git clone `
+   1. `git clone <copied url>`
    2. `cd seasonal`
    3. `npm install`
    4. `npm run dev`
