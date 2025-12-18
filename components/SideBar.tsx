@@ -16,7 +16,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   // กำหนดเมนูต่างๆ
   const menuItems = [
     { name: "Dashboard", href: "/", icon: Home },
-    { name: "SeasonStock", href: "/seasonstock", icon: PieChart },
+    { name: "Seasonal Stock", href: "/seasonstock", icon: PieChart },
     { name: "ข่าว", href: "/news", icon: Newspaper },
     { name: "Watchlist", href: "/watchlist", icon: Star },
     { name: "คู่มือ", href: "/handbook", icon: Star },

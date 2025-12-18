@@ -112,8 +112,7 @@ export default function StockChart({ symbol, initialData = [] }: StockChartProps
         ))}
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-8 items-start justify-between">
-        
+      <div className="flex flex-col lg:flex-row gap-8 items-stretch justify-between">
         {/* Stock Chart */}
         <div className="w-full lg:flex-1 h-[450px] bg-white rounded-xl border border-gray-200 shadow-sm p-4 relative min-w-0">
             {isLoading ? (
@@ -157,9 +156,8 @@ export default function StockChart({ symbol, initialData = [] }: StockChartProps
         </div>
 
         {/* Stock Details */}
-        <div className="w-full lg:w-[350px] flex flex-col gap-4">
-          {/* Top Box (ราคาหุ้นปัจจุบัน, Market Cap, ...) */}
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+        <div className="w-full lg:w-[350px] flex flex-col justify-between gap-4">          {/* Top Box */}
+          <div className="bg-white rounded-xl border border-gray-200 shadow-md shadow-[#247AE0] p-5">
             <h3 className="text-gray-900 font-bold mb-2 pb-2">
               ข้อมูลตลาดหุ้น
             </h3>
@@ -172,8 +170,8 @@ export default function StockChart({ symbol, initialData = [] }: StockChartProps
             </div>
           </div>
 
-          {/* Bottom Box (รายได้รวม, ...) */}
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+          {/* Bottom Box */}
+          <div className="bg-white rounded-xl border border-gray-200 shadow-md shadow-[#247AE0] p-5">
             <h3 className="text-gray-900 font-bold mb-2 pb-2">
               ผลการดำเนินงานล่าสุด
             </h3>
