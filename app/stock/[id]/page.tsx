@@ -2,6 +2,7 @@ import { seasonalStocks } from "@/lib/mockData";
 import { notFound } from "next/navigation";
 import Header from "@/components/Header";
 import StockChart from "@/components/StockChart";
+import { div } from "framer-motion/client";
 
 
 async function getStockHistory(symbol: string) {
@@ -59,16 +60,16 @@ export default async function StockDetail({ params }: PageProps) {
         displayChange = currentPrice - prevPrice;
         displayChangePercent = ((displayChange / prevPrice) * 100);
 
-        // จัดรูปแบบวันที่
+        
         const dateObj = new Date(latest.date);
+        // จัดรูปแบบวันที่
         lastUpdateDate = dateObj.toLocaleDateString('th-TH', {
             year: 'numeric',
             month: 'long',
             day: 'numeric',
         });
-        
         // จัดรูปแบบเวลา
-        lastUpdateTime = `อัปเดตเวลา ${dateObj.toLocaleTimeString('th-TH', {
+        lastUpdateTime = `${dateObj.toLocaleTimeString('th-TH', {
             hour: '2-digit',
             minute: '2-digit',
         })} น.`;
@@ -123,14 +124,22 @@ export default async function StockDetail({ params }: PageProps) {
             </div>
 
             {/* Right div (วันที่) */}
-            <div className="flex flex-col items-start md:items-end mt-4 md:mt-0">
-              <p className="font-bold text-gray-700 text-lg">
-                {lastUpdateDate}
+            <div className="flex flex-col items-start mt-4 md:mt-0">
+              <p className="font-bold text-gray-500 text-lg">
+                อัปเดตล่าสุด
               </p>
               {lastUpdateTime && (
-                <p className="text-sm text-gray-500 mt-1">
-                   {lastUpdateTime}
-                </p>
+                <div className="text-gray-500 ">
+                  <span className="text-sm mt-1">
+                    {lastUpdateTime}
+                  </span>
+                  <span className="mx-1 text-">
+                    •
+                  </span>
+                  <span className="text-sm mt-1">
+                    {lastUpdateDate}
+                  </span>
+                </div>
               )}
             </div>
 
