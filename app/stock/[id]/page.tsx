@@ -25,11 +25,9 @@ interface PageProps {
 }
 
 export default async function StockDetail({ params }: PageProps) {
-  // ดึงค่า symbol จาก URL
   const { id } = await params;
   const symbol = id;
 
-  // ดึงข้อมูล static (ชื่อ, หมวดหมู่) จาก mock data
   const stockStaticInfo = seasonalStocks.find(
     (s) => s.symbol === decodeURIComponent(symbol)
   );
@@ -38,20 +36,26 @@ export default async function StockDetail({ params }: PageProps) {
     return notFound();
   }
 
-  const historyData = await getStockHistory(symbol);
+  // ดึงข้อมูลมา (ได้เป็น Object { history, info })
+  const serviceData = await getStockData(symbol, "1M");
+  
+  // เอาเฉพาะ history (Array)
+  const historyData = serviceData?.history || []; 
+
   let displayPrice = stockStaticInfo.price;
   let displayChange = (stockStaticInfo.price * stockStaticInfo.changePercent) / 100;
   let displayChangePercent = stockStaticInfo.changePercent;
   let lastUpdateDate = "ไม่ระบุวันที่";
   let lastUpdateTime = "";
 
+
   if (historyData && Array.isArray(historyData) && historyData.length >= 2) {
-    // กรองข้อมูลที่เป็น Null ออกก่อน
+    // กรองข้อมูลที่เป็น Null ออก
     const validData = historyData.filter((d: any) => d.close !== null || d.adjClose !== null);
     
     if (validData.length >= 2) {
-        const latest = validData[validData.length - 1]; // แท่งล่าสุด
-        const previous = validData[validData.length - 2]; // แท่งก่อนหน้า (เพื่อเทียบราคา)
+        const latest = validData[validData.length - 1]; 
+        const previous = validData[validData.length - 2]; 
 
         const currentPrice = latest.close || latest.adjClose;
         const prevPrice = previous.close || previous.adjClose;
@@ -60,7 +64,6 @@ export default async function StockDetail({ params }: PageProps) {
         displayChange = currentPrice - prevPrice;
         displayChangePercent = ((displayChange / prevPrice) * 100);
 
-        
         const dateObj = new Date(latest.date);
         // จัดรูปแบบวันที่
         lastUpdateDate = dateObj.toLocaleDateString('th-TH', {
@@ -76,7 +79,6 @@ export default async function StockDetail({ params }: PageProps) {
     }
   }
 
-  // กำหนดสีตามค่า
   const isPositive = displayChange >= 0;
   const trendColor = isPositive ? "text-green-600" : "text-red-600";
   const trendSign = isPositive ? "+" : "";
@@ -87,7 +89,6 @@ export default async function StockDetail({ params }: PageProps) {
 
       <div className="min-h-screen bg-gray-50 py-6 px-10 xl:px-30">        
         
-        {/* Header Section */}
         <div className="pb-6 mb-2">
           <h1 className="text-5xl font-bold text-gray-900">{stockStaticInfo.symbol}</h1>
           <p className="text-xl text-gray-500 mt-2 font-semibold">{stockStaticInfo.name}</p>
@@ -98,18 +99,17 @@ export default async function StockDetail({ params }: PageProps) {
         </div>
         {/* Price Section */}
         <div className="bg-white rounded-xl shadow-md p-8 shadow-[#247AE0]">
+       
           <div className="flex flex-col md:justify-between md:flex-row md:items-start">
             
-            {/* Left div */}
             <div className="flex flex-col items-start md:flex-row md:items-start">
-              {/* ราคาหุ้นปัจจุบัน */}
               <div className="md:pr-8 md:border-r">
                 <p className="text-gray-500 text-sm">ราคาหุ้นปัจจุบัน</p>
                 <p className="text-2xl font-bold text-gray-900 mt-1">
                   {displayPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </p>
               </div>
-              {/* เปลี่ยนแปลงวันนี้ */}
+              
               <div className="md:pl-8">
                 <p className="text-gray-500 text-sm">เปลี่ยนแปลงวันนี้</p>
                 <div className={`flex items-baseline mt-1 ${trendColor}`}>                  
@@ -146,8 +146,8 @@ export default async function StockDetail({ params }: PageProps) {
           </div>        
         </div>
 
-        {/* Parse symbol */}
-        <StockChart symbol={stockStaticInfo.symbol} />
+        {/* ส่ง historyData (Array) เข้า Chart เพื่อแสดงผล */}
+        <StockChart symbol={symbol} initialData={historyData} />
         
       </div>
     </main>
