@@ -24,7 +24,7 @@ export default function Header() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   
   // Search state
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  // const [isSearchOpen, setIsSearchOpen] = useState(false);
   
   const searchRef = useRef<HTMLDivElement>(null);
 
@@ -35,9 +35,9 @@ export default function Header() {
         setIsOpen(false);
       }
       
-      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
-        setIsSearchOpen(false);
-      }
+      // if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+      //   setIsSearchOpen(false);
+      // }
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
@@ -76,8 +76,9 @@ export default function Header() {
 
         <div className="flex flex-1 justify-end items-center mr-2" ref={searchRef}>
           
-          <div className="flex items-center gap-2"> 
-            
+
+          {/* Uncomment this to show search bar */}
+          {/* <div className="flex items-center gap-2"> 
             {isSearchOpen && (
               <div className="relative w-full min-w-100 md:w-6"> 
                 <input
@@ -89,7 +90,6 @@ export default function Header() {
               </div>
             )}
 
-            {/* Toggle Button: แสดงตลอดเวลา */}
             <button 
               onClick={() => setIsSearchOpen(!isSearchOpen)}
               // className={`px-3 py-1.5 text-white rounded-full transition cursor-pointer flex items-center justify-center mr-2
@@ -106,12 +106,11 @@ export default function Header() {
                 
               `}
             >
-              {/* {isSearchOpen ? <X className="w-5 h-5" /> : <Search className="w-5 h-5" />} */}
               <Search className="w-5 h-5" />
-            
             </button>
+          </div> */}
 
-          </div>
+
 
         </div>
 

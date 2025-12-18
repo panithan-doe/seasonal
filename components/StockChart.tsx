@@ -13,9 +13,10 @@ import {
 
 interface StockChartProps {
   symbol: string;
+  initialData?: any[];
 }
 
-// Mock stats เดิม (คงไว้ตามคำขอ เพราะ API ปัจจุบันเราดึงแค่กราฟราคา)
+// TODO: Delete this later
 const defaultMarketStats = {
   marketCap: "2.5 ล้านบาท",
   volume: "10.2 ล้านบาท",
@@ -29,12 +30,10 @@ const financialStats = {
   eps: "~2.15 บาท",
 };
 
-export default function StockChart({ symbol }: StockChartProps) {
+export default function StockChart({ symbol, initialData = [] }: StockChartProps) {  
   const [timeRange, setTimeRange] = useState("1D");
-  const [chartData, setChartData] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  
-  // เพิ่ม State สำหรับเก็บราคาล่าสุดที่ดึงมาจาก API
+  const [chartData, setChartData] = useState<any[]>(initialData);
+  const [isLoading, setIsLoading] = useState(false);  
   const [latestPrice, setLatestPrice] = useState<string>("Loading...");
 
   const ranges = ["1D", "1W", "1M", "1Y"];
@@ -46,6 +45,8 @@ export default function StockChart({ symbol }: StockChartProps) {
       try {
         const res = await fetch(`/api/stock/history?symbol=${symbol}&range=${timeRange}`);
         const data = await res.json();
+
+        console.log('data: ', data)
         
         if (Array.isArray(data) && data.length > 0) {
             // กรองข้อมูลที่อาจจะเป็น null
@@ -94,7 +95,7 @@ export default function StockChart({ symbol }: StockChartProps) {
 
   return (
     <div className="flex flex-col gap-6 mt-8">
-      {/* Range filter button */}
+      {/* Range filter (1D, 1M, ...) */}
       <div className="flex items-center gap-2">
         {ranges.map((range) => (
           <button
@@ -112,6 +113,7 @@ export default function StockChart({ symbol }: StockChartProps) {
       </div>
 
       <div className="flex flex-col lg:flex-row gap-8 items-start justify-between">
+        
         {/* Stock Chart */}
         <div className="w-full lg:flex-1 h-[450px] bg-white rounded-xl border border-gray-200 shadow-sm p-4 relative min-w-0">
             {isLoading ? (
@@ -156,7 +158,7 @@ export default function StockChart({ symbol }: StockChartProps) {
 
         {/* Stock Details */}
         <div className="w-full lg:w-[350px] flex flex-col gap-4">
-          {/* Top Box */}
+          {/* Top Box (ราคาหุ้นปัจจุบัน, Market Cap, ...) */}
           <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
             <h3 className="text-gray-900 font-bold mb-2 pb-2">
               ข้อมูลตลาดหุ้น
@@ -170,7 +172,7 @@ export default function StockChart({ symbol }: StockChartProps) {
             </div>
           </div>
 
-          {/* Bottom Box */}
+          {/* Bottom Box (รายได้รวม, ...) */}
           <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
             <h3 className="text-gray-900 font-bold mb-2 pb-2">
               ผลการดำเนินงานล่าสุด
@@ -187,6 +189,7 @@ export default function StockChart({ symbol }: StockChartProps) {
   );
 }
 
+// Helper function: ใช้ใน Stock Details ที่แสดงรายละเอียดหุ้น (Top box & bottom box)
 function RowItem({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex justify-between items-center text-sm">

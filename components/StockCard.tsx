@@ -27,11 +27,10 @@ const StockCard = ({ stock }: StockProps) => {
   const trendSign = isPositive ? '+' : '';
   const isWatchlistColor = isWatchlist ? 'text-[#ecc353]' : 'text-gray-300';
   const priceChange = (stock.price * stock.changePercent) / 100;
-  const growthPeriod = "กรกฏาคม-กันยายน"; // Need to change
+  const growthPeriod = "กรกฏาคม-กันยายน"; // TODO: Need to change
   const { showToast } = useToast();
 
-  // NOTE: percent loss ยังไม่รู้ว่าคำนวณจากอะไร
-  const lossColor = stock.percentLoss <= 5 ? 'text-green-600' : 'text-yellow-600';
+  // const lossColor = stock.percentLoss <= 5 ? 'text-green-600' : 'text-yellow-600';
 
 
   const handleToggleWatchlist = (e: React.MouseEvent) => {
@@ -46,9 +45,6 @@ const StockCard = ({ stock }: StockProps) => {
     } else {
       showToast(`${stock.symbol} ถูกลบออกจาก Watchlist`, "error");
     }
-  
-    // TODO: Real API call to update watchlist status
-    // ...
 
   }
 
