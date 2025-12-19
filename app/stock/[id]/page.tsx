@@ -1,4 +1,3 @@
-// import { seasonalStocks } from "@/lib/mockData";
 import { notFound } from "next/navigation";
 import Header from "@/components/Header";
 import StockChart from "@/components/StockChart";
@@ -64,22 +63,22 @@ export default async function StockDetail({ params }: PageProps) {
         </div>
 
         <div className="mb-4">
-          <h1 className="text-[#4285F4] font-extrabold text-xl">ภาพรวมหุ้น</h1>
+          <h1 className="text-[#4285F4] font-extrabold text-2xl">ภาพรวมหุ้น</h1>
         </div>
         
-        <div className="bg-white rounded-xl shadow-sm p-8">
+        <div className="bg-white rounded-xl shadow-md shadow-[#4285F4] p-8">
           <div className="flex flex-col md:justify-between md:flex-row md:items-start">
             
             <div className="flex flex-col items-start md:flex-row md:items-start">
               <div className="md:pr-8 md:border-r">
-                <p className="text-gray-500 text-sm">ราคาหุ้นปัจจุบัน</p>
+                <p className="text-[#4285F4] text-lg font-semibold">ราคาหุ้นปัจจุบัน</p>
                 <p className="text-2xl font-bold text-gray-900 mt-1">
                   {currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </p>
               </div>
               
               <div className="md:pl-8">
-                <p className="text-gray-500 text-sm">เปลี่ยนแปลงวันนี้</p>
+                <p className="text-[#4285F4] text-lg font-semibold">เปลี่ยนแปลงวันนี้</p>
                 <div className={`flex items-baseline mt-1 ${trendColor}`}>                  
                   <span className="text-2xl font-bold mr-2">
                       {trendSign}{change.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -91,7 +90,7 @@ export default async function StockDetail({ params }: PageProps) {
               </div>
             </div>
 
-            <div className="flex flex-col items-start justify-start mt-4 md:mt-0">
+            <div className="flex flex-col items-start gap-2 mt-4 md:mt-0">
               <p className="font-semibold text-gray-500">
                 อัปเดตล่าสุด
               </p>
@@ -116,8 +115,12 @@ export default async function StockDetail({ params }: PageProps) {
           </div>        
         </div>
 
-        {/* ส่ง historyData (Array) เข้า Chart เพื่อแสดงผล */}
-        <StockChart symbol={symbol} initialData={initialChartData} />
+
+        <StockChart 
+          symbol={symbol} 
+          initialData={initialChartData}
+          stockInfo={info}
+        />
         
       </div>
     </main>
