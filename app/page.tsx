@@ -154,7 +154,7 @@ export default function Home() {
         {viewMode === "card" ? (
             <RecommendGridView />
         ) : (
-            <StockDashboard />
+            <StockDashboard stocks={displayedStocks}/>
         )}
 
         
