@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, ArrowRight, ArrowLeft } from "lucide-react";
 
 // นิยาม Type ให้ตรงกับ Mock Data ของคุณ
 interface StockData {
@@ -16,7 +16,20 @@ interface StockData {
   duration: number;  // รับเป็นจำนวนวัน (เช่น 10)
   signal: string;    // 'BUY', 'SELL', 'HOLD'
   volume?: string;
-  month: number; 
+  month: number;
+}
+
+// Type สำหรับ Gantt Bar (บางหุ้นจะถูก split ถ้าหุ้นคาบเกี่ยวเดือน)
+interface GanttBarData {
+  id: string;
+  name: string;
+  start: number;
+  duration: number;
+  percent: string;
+  color: string;
+  isContinuation: boolean; // true ถ้าเป็นส่วนที่ต่อจากเดือนก่อน
+  hasNext: boolean; // true ถ้ายังมีส่วนต่อในเดือนถัดไป
+  originalStock: StockData; // เก็บข้อมูลหุ้นต้นฉบับ
 }
 
 interface StockDashboardProps {
@@ -34,19 +47,53 @@ const thaiMonthsShort = [
     "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."
 ];
 
+// Helper: คำนวณจำนวนวันในเดือน
+const getDaysInMonth = (year: number, month: number): number => {
+  return new Date(year, month + 1, 0).getDate();
+};
+
+// Helper: ตรวจสอบว่าหุ้นคาบเกี่ยวเดือนหรือไม่
+const isStockSpanningMonths = (stock: StockData, year: number): boolean => {
+  const daysInMonth = getDaysInMonth(year, stock.month);
+  return (stock.startDate + stock.duration - 1) > daysInMonth;
+};
+
 
 export default function StockDashboard({ stocks }: StockDashboardProps) {
 
     // เริ่มวันที่ 1 เดือน 8 (กันยายน) ปี 2025
     const [currentDate, setCurrentDate] = useState(new Date(2025, 8, 1));
 
-    const currentMonthIndex = currentDate.getMonth(); 
+    const currentMonthIndex = currentDate.getMonth();
     const currentYear = currentDate.getFullYear();
 
     // Logic คำนวณขอบเขตไตรมาส
     const currentQuarter = Math.floor(currentMonthIndex / 3);
     const startMonthOfQuarter = currentQuarter * 3;       // เช่น Q3 = 6 (กรกฎาคม)
     const endMonthOfQuarter = startMonthOfQuarter + 2;    // เช่น Q3 = 8 (กันยายน)
+
+    // สร้าง sortedList เฉพาะหุ้นในไตรมาสปัจจุบัน เรียงตาม timeline
+    const sortedList = useMemo(() => {
+        return [...stocks]
+            .filter(stock => stock.month >= startMonthOfQuarter && stock.month <= endMonthOfQuarter) // กรองเฉพาะหุ้นในไตรมาสนี้
+            .sort((a, b) => {
+                // เรียงตามเดือนก่อน
+                if (a.month !== b.month) return a.month - b.month;
+                // ถ้าเดือนเดียวกัน เรียงตามวันที่
+                if (a.startDate !== b.startDate) return a.startDate - b.startDate;
+                // ถ้าวันเดียวกัน เรียงตาม symbol
+                return a.symbol.localeCompare(b.symbol);
+            });
+    }, [stocks, startMonthOfQuarter, endMonthOfQuarter]);
+
+    // สร้าง index mapping จาก sortedList
+    const stockIndexMap = useMemo(() => {
+        const map: Record<string, number> = {};
+        sortedList.forEach((stock, index) => {
+            map[stock.symbol] = index;
+        });
+        return map;
+    }, [sortedList]);
 
     const handlePrevMonth = () => {
         if (currentMonthIndex > startMonthOfQuarter) {
@@ -67,49 +114,122 @@ export default function StockDashboard({ stocks }: StockDashboardProps) {
     const prevMonthName = hasPrevMonth ? thaiMonths[currentMonthIndex - 1] : "";
     const nextMonthName = hasNextMonth ? thaiMonths[currentMonthIndex + 1] : "";
 
+    // Filter หุ้นที่จะแสดงในเดือนปัจจุบัน
+    // รวมทั้งหุ้นที่เริ่มในเดือนนี้ และหุ้นที่เริ่มเดือนก่อนแต่คาบเกี่ยวมาถึงเดือนนี้
     const monthlyStocks = useMemo(() => {
-        return stocks.filter(stock => stock.month === currentMonthIndex);
-    }, [stocks, currentMonthIndex]);
+        return stocks.filter(stock => {
+            // กรณีที่ 1: หุ้นเริ่มในเดือนนี้
+            if (stock.month === currentMonthIndex) {
+                return true;
+            }
 
-  // 1. แปลงข้อมูลสำหรับ Gantt Chart
+            // กรณีที่ 2: หุ้นเริ่มเดือนก่อนหน้า และคาบเกี่ยวมาถึงเดือนนี้
+            if (stock.month === currentMonthIndex - 1) {
+                const isSpanning = isStockSpanningMonths(stock, currentYear);
+                return isSpanning;
+            }
+
+            return false;
+        });
+    }, [stocks, currentMonthIndex, currentYear]);
+
+  // แปลงข้อมูลสำหรับ Gantt Chart
   const ganttData = useMemo(() => {
-    return monthlyStocks.map((stock, index) => ({
-      id: index,
-      name: stock.symbol,
-      start: stock.startDate,
-      duration: stock.duration,
-      percent: stock.changePercent > 0 ? `+${stock.changePercent}%` : `${stock.changePercent}%`,
-      color: "bg-[#247AE0]" // สีเดิมที่คุณต้องการ
-    }));
-  }, [stocks]); 
+    const currentMonthStocksMap = new Map<string, StockData>();
+    monthlyStocks.forEach(stock => {
+      currentMonthStocksMap.set(stock.symbol, stock);
+    });
 
-  // 2. แปลงข้อมูลสำหรับ Table ด้านล่าง
-  const dashboardTableData = useMemo(() => {
-    return monthlyStocks.map((stock) => {
-      const isPositive = stock.changePercent >= 0;
-      
-      // ทำให้วันที่ในตารางเปลี่ยนตามเดือนที่เลือกใน Header
-      // เช่น "12 ก.ย. 2568"
-      const dateString = `${stock.startDate} ${thaiMonthsShort[currentMonthIndex]} ${currentYear + 543}`; 
+    // สร้าง rows ตามจำนวนหุ้นทั้งหมดใน sortedList
+    return sortedList.map((sortedStock, index): GanttBarData | null => {
+      const stock = currentMonthStocksMap.get(sortedStock.symbol);
 
-      let signalColor = "text-yellow-500";
-      if (stock.signal === "BUY") signalColor = "text-green-500";
-      if (stock.signal === "SELL") signalColor = "text-red-500";
+      // ถ้าหุ้นนี้ไม่มีในเดือนปัจจุบัน → return null (ปล่อยว่าง)
+      if (!stock) {
+        return null;
+      }
+
+      // หุ้นมีในเดือนนี้ → คำนวณ bar data
+      const daysInCurrentMonth = getDaysInMonth(currentYear, currentMonthIndex);
+      const daysInStockMonth = getDaysInMonth(currentYear, stock.month);
+
+      let start = stock.startDate;
+      let duration = stock.duration;
+      let isContinuation = false;
+      let hasNext = false;
+
+      // ตรวจสอบว่าหุ้นนี้เริ่มในเดือนปัจจุบันหรือไม่
+      const isStartingThisMonth = stock.month === currentMonthIndex;
+
+      if (isStartingThisMonth) {
+        // หุ้นเริ่มในเดือนนี้
+        const endDate = stock.startDate + stock.duration - 1;
+
+        if (endDate > daysInCurrentMonth) {
+          // คาบเกี่ยวไปเดือนถัดไป - ตัดให้แสดงแค่ถึงสิ้นเดือน
+          duration = daysInCurrentMonth - stock.startDate + 1;
+          hasNext = true;
+        }
+      } else {
+        // หุ้นเริ่มจากเดือนก่อนหน้า - แสดงเฉพาะส่วนที่ต่อมาในเดือนนี้
+        isContinuation = true;
+        start = 1; // เริ่มต้นที่วันที่ 1 ของเดือนนี้
+
+        // คำนวณว่าเหลืออีกกี่วันที่ต้องแสดง
+        const daysUsedInPreviousMonth = daysInStockMonth - stock.startDate + 1;
+        const remainingDays = stock.duration - daysUsedInPreviousMonth;
+        duration = Math.min(remainingDays, daysInCurrentMonth);
+      }
 
       return {
-        symbol: stock.symbol,
-        date: dateString,
-        days: stock.duration,
-        price: stock.price,
-        change: isPositive ? `+${stock.changePercent}%` : `${stock.changePercent}%`,
-        signal: stock.signal,
-        vol: stock.volume || "N/A", 
-        cat: stock.category,
-        signalColor: signalColor,
-        isPositive: isPositive 
+        id: `${stock.symbol}-${stockIndexMap[stock.symbol]}`,
+        name: stock.symbol,
+        start,
+        duration,
+        percent: stock.changePercent > 0 ? `+${stock.changePercent}%` : `${stock.changePercent}%`,
+        color: "bg-[#247AE0]",
+        isContinuation,
+        hasNext,
+        originalStock: stock
       };
     });
-  }, [monthlyStocks, currentMonthIndex, currentYear]); // เพิ่ม dependency เพื่อให้ตารางอัปเดตเมื่อเปลี่ยนเดือน
+  }, [sortedList, monthlyStocks, currentMonthIndex, currentYear, stockIndexMap]); 
+
+  // แปลงข้อมูลสำหรับ Table ด้านล่าง
+  // แสดงเฉพาะหุ้นที่เริ่มในเดือนนี้เท่านั้น (ไม่รวมหุ้นที่ต่อมาจากเดือนก่อน)
+  const dashboardTableData = useMemo(() => {
+    return monthlyStocks
+      .filter(stock => stock.month === currentMonthIndex)
+      .map((stock) => {
+        const isPositive = stock.changePercent >= 0;
+
+        const dateString = `${stock.startDate} ${thaiMonthsShort[currentMonthIndex]} ${currentYear + 543}`;
+
+        let signalColor = "text-yellow-500";
+        if (stock.signal === "BUY") signalColor = "text-green-500";
+        if (stock.signal === "SELL") signalColor = "text-red-500";
+
+        // ตรวจสอบว่าหุ้นคาบเกี่ยวเดือนหรือไม่
+        const isSpanning = isStockSpanningMonths(stock, currentYear);
+        const daysInMonth = getDaysInMonth(currentYear, stock.month);
+
+        return {
+          symbol: stock.symbol,
+          date: dateString,
+          days: stock.duration, // แสดงจำนวนวันรวมทั้งหมด
+          daysDisplay: isSpanning
+            ? `${stock.duration} (${daysInMonth - stock.startDate + 1}→${stock.duration - (daysInMonth - stock.startDate + 1)})`
+            : stock.duration, // ถ้าคาบเกี่ยว แสดงว่าแบ่งเป็น 2 เดือน
+          price: stock.price,
+          change: isPositive ? `+${stock.changePercent}%` : `${stock.changePercent}%`,
+          signal: stock.signal,
+          vol: stock.volume || "N/A",
+          cat: stock.category,
+          signalColor: signalColor,
+          isPositive: isPositive
+        };
+      });
+  }, [monthlyStocks, currentMonthIndex, currentYear]);
 
   return (
     <div className="w-full pb-12 mt-6"> 
@@ -147,29 +267,88 @@ export default function StockDashboard({ stocks }: StockDashboardProps) {
             </div>
         ) : (
             <div className="min-w-[800px]">
-                <div className="grid grid-cols-30 border-b" style={{ gridTemplateColumns: 'repeat(30, minmax(0, 1fr))' }}>
-                {Array.from({ length: 30 }, (_, i) => (
-                    <div key={i} className={`text-[10px] md:text-xs text-center py-2 border-r ${i + 1 === 30 ? 'bg-orange-400 text-white' : 'text-gray-500'}`}>
-                    {i + 1}
-                    </div>
-                ))}
-                </div>
+                {/* Header: แสดงตัวเลขวันที่ตามจำนวนวันจริง */}
+                {(() => {
+                    const daysInMonth = getDaysInMonth(currentYear, currentMonthIndex);
+                    return (
+                        <div className="grid border-b" style={{ gridTemplateColumns: `repeat(${daysInMonth}, minmax(0, 1fr))` }}>
+                            {Array.from({ length: daysInMonth }, (_, i) => (
+                                <div key={i} className={`text-[10px] md:text-xs text-center py-2 border-r ${i + 1 === daysInMonth ? 'bg-orange-400 text-white' : 'text-gray-500'}`}>
+                                    {i + 1}
+                                </div>
+                            ))}
+                        </div>
+                    );
+                })()}
 
                 <div className="relative py-4 space-y-3 px-1">
-                {ganttData.map((item) => (
-                    <div 
-                        key={item.id} 
-                        className="relative h-8 z-10 flex items-center"
-                        style={{
-                            marginLeft: `${((item.start - 1) / 30) * 100}%`,
-                            width: `${(item.duration / 30) * 100}%`
-                        }}
-                    >
-                        <div className={`${item.color} text-white text-[10px] md:text-xs font-semibold w-full h-full rounded flex items-center justify-center shadow-sm whitespace-nowrap overflow-hidden px-2`}>
-                            {item.duration}วัน / {item.name} ({item.percent})
+                {/* Background Grid */}
+                <div className="absolute inset-0 pointer-events-none" style={{ top: '1rem', bottom: '1rem' }}>
+                    {/* Grid ตาราง */}
+                    {ganttData.map((_, rowIndex) => {
+                        const daysInMonth = getDaysInMonth(currentYear, currentMonthIndex);
+                        return (
+                            <div
+                                key={`grid-row-${rowIndex}`}
+                                className="flex h-8 mb-3"
+                            >
+                                {Array.from({ length: daysInMonth }, (_, colIndex) => (
+                                    <div
+                                        key={`grid-${rowIndex}-${colIndex}`}
+                                        className="flex-1 border-r border-b border-gray-200"
+                                        style={{ minWidth: `${100 / daysInMonth}%` }}
+                                    />
+                                ))}
+                            </div>
+                        );
+                    })}
+                </div>
+
+                {/* Gantt Bars (ด้านหน้า) */}
+                {ganttData.map((item, index) => {
+                    const daysInMonth = getDaysInMonth(currentYear, currentMonthIndex);
+
+                    // ถ้า item เป็น null → แสดง empty row
+                    if (!item) {
+                        return (
+                            <div
+                                key={`empty-${index}`}
+                                className="relative h-8 z-10"
+                            >
+                                {/* Empty placeholder */}
+                            </div>
+                        );
+                    }
+
+                    // item มีข้อมูล → แสดง bar ตามปกติ
+                    return (
+                        <div
+                            key={item.id}
+                            className="relative h-8 z-10 flex items-center"
+                            style={{
+                                marginLeft: `${((item.start - 1) / daysInMonth) * 100}%`,
+                                width: `${(item.duration / daysInMonth) * 100}%`
+                            }}
+                        >
+                            <div className={`${item.color} text-white text-[10px] md:text-xs font-semibold w-full h-full rounded flex items-center justify-between shadow-sm overflow-hidden px-2`}>
+                                {/* แสดง Arrow Left ถ้าต่อมาจากเดือนก่อน */}
+                                {item.isContinuation && (
+                                    <ArrowLeft className="w-3 h-3 md:w-4 md:h-4 flex-shrink-0 opacity-80" />
+                                )}
+
+                                {/* ข้อความกลาง */}
+                                <span className="whitespace-nowrap px-1 flex-1 text-center">
+                                    {item.duration}วัน / {item.name} ({item.percent})
+                                </span>
+
+                                {/* แสดง Arrow Right ถ้ายังมีต่อในเดือนถัดไป */}
+                                {item.hasNext && (
+                                    <ArrowRight className="w-3 h-3 md:w-4 md:h-4 flex-shrink-0 opacity-80" />
+                                )}
+                            </div>
                         </div>
-                    </div>
-                ))}
+                    );
+                })}
                 </div>
             </div>
         )}
@@ -200,7 +379,7 @@ export default function StockDashboard({ stocks }: StockDashboardProps) {
                                 <td className="py-4 pl-2 font-semibold text-[#247AE0]">{stock.symbol}</td>
                                 {/* ใช้วันที่แบบ Dynamic จาก state */}
                                 <td className="py-4 font-medium text-gray-900">{stock.date}</td>
-                                <td className="py-4 font-medium text-gray-900">{stock.days}</td>
+                                <td className="py-4 font-medium text-gray-900">{stock.daysDisplay}</td>
                                 <td className="py-4 font-medium text-gray-900">{stock.price.toFixed(2)}</td>
                                 <td className={`py-4 font-medium ${stock.isPositive ? 'text-green-500' : 'text-red-500'}`}>{stock.change}</td>
                                 <td className={`py-4 font-bold ${stock.signalColor}`}>{stock.signal}</td>
@@ -227,8 +406,7 @@ export default function StockDashboard({ stocks }: StockDashboardProps) {
                     }}>
                 </div>
                 <div className="absolute inset-0 m-auto w-24 h-24 bg-white rounded-full flex items-center justify-center flex-col">
-                   <span className="text-gray-500 font-semibold text-sm">Portfolio</span>
-                   <span className="text-[#247AE0] font-bold text-lg">View</span>
+                   <span></span>
                 </div>
              </div>
 
