@@ -45,17 +45,32 @@ function getYahooFinance() {
 // GET: All Data
 export async function getStockData(symbol: string, range: string = "1D") {
   try {
-    const yahooFinance = getYahooFinance();
+    const yahoo = getYahooFinance();
     const queryOptions = getQueryOptions(range);
 
-    const [chartResult, quoteResult] = await Promise.all([
-      yahooFinance.chart(symbol, queryOptions),
-      yahooFinance.quote(symbol)
+    const [chartResult, quoteResult, summaryResult] = await Promise.all([
+      yahoo.chart(symbol, queryOptions),
+      yahoo.quote(symbol),
+      yahoo.quoteSummary(symbol, {modules: ['price', 'summaryDetail', 'financialData', 'defaultKeyStatistics'] })
     ]);
 
+    const financialData = summaryResult?.financialData || {};
+    const keyStats = summaryResult?.defaultKeyStatistics || {};
+    const summaryDetail = summaryResult?.summaryDetail || {};
+
+    const mergeInfo = {
+      ...quoteResult,
+      revenue: financialData.totalRevenue,
+      netProfit: financialData.netIncomeToCommon,
+      
+      pbv: keyStats.priceToBook,
+      pe: summaryDetail.trailingPE, 
+      eps: keyStats.trailingEps,
+    }
+
     return {
-      history: chartResult.quotes,
-      info: quoteResult
+      history: chartResult.quotes || [],
+      info: mergeInfo || {}
     };
   } catch (error: any) {
     console.error("Yahoo Service Error:", error);
@@ -63,16 +78,16 @@ export async function getStockData(symbol: string, range: string = "1D") {
   }
 }
 
-// GET: Stock Graph
-export async function getStockHistory(symbol: string, range: string = "1D") {
-    try {
-      const yahooFinance = getYahooFinance();
-      const queryOptions = getQueryOptions(range);
-      
-      const result = await yahooFinance.chart(symbol, queryOptions);
-      return result.quotes;
-    } catch (error: any) {
-      console.error("Yahoo Chart Error:", error);
-      return [];
-    }
+// GET: Chart Data 
+export async function getStockChartData(symbol: string, range: string = "1D") {
+  try {
+    const yahoo = getYahooFinance();
+    const queryOptions = getQueryOptions(range);
+    
+    const result = await yahoo.chart(symbol, queryOptions);
+    return result.quotes || [];
+  } catch (error: any) {
+    console.error("Yahoo Chart Error:", error);
+    return [];
   }
+}

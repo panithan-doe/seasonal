@@ -2,59 +2,41 @@
 
 import { useState, useEffect, useMemo } from "react";
 import {
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from "recharts";
+
 
 interface StockChartProps {
   symbol: string;
   initialData?: any[];
+  stockInfo: any;
 }
 
-// TODO: Delete this later
-const defaultMarketStats = {
-  marketCap: "2.5 ล้านบาท",
-  volume: "10.2 ล้านบาท",
-  pe: "~221-223x",
-  pbv: "~0.79-0.80x",
-};
 
-const financialStats = {
-  revenue: "~512 ล้านบาท",
-  netProfit: "450 ล้านบาท",
-  eps: "~2.15 บาท",
-};
-
-export default function StockChart({ symbol, initialData = [] }: StockChartProps) {  
+export default function StockChart({ symbol, initialData = [], stockInfo }: StockChartProps) {  
   const [timeRange, setTimeRange] = useState("1D");
   const [chartData, setChartData] = useState<any[]>(initialData);
   const [isLoading, setIsLoading] = useState(false);  
-  const [latestPrice, setLatestPrice] = useState<string>("Loading...");
 
   const ranges = ["1D", "1W", "1M", "1Y"];
 
-  // ฟังก์ชันดึงข้อมูลกราฟ
   useEffect(() => {
+
+    if (timeRange === "1D" && initialData.length > 0 && chartData === initialData) {
+        return;
+    }
+
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const res = await fetch(`/api/stock/history?symbol=${symbol}&range=${timeRange}`);
+        const res = await fetch(`/api/stock/chart?symbol=${symbol}&range=${timeRange}`);
         const data = await res.json();
-
-        console.log('data: ', data)
         
         if (Array.isArray(data) && data.length > 0) {
-            // กรองข้อมูลที่อาจจะเป็น null
             const validData = data.filter((d: any) => d.close !== null || d.adjClose !== null);
-
             const formatted = validData.map((d: any) => ({
                 ...d,
-                price: d.close || d.adjClose, // ใช้ราคาปิด
+                price: d.close || d.adjClose,
                 displayDate: new Date(d.date).toLocaleDateString('th-TH', {
                     hour: timeRange === '1D' ? '2-digit' : undefined,
                     minute: timeRange === '1D' ? '2-digit' : undefined,
@@ -62,49 +44,39 @@ export default function StockChart({ symbol, initialData = [] }: StockChartProps
                     month: 'short'
                 })
             }));
-            
             setChartData(formatted);
-
-            if (formatted.length > 0) {
-              const lastItem = formatted[formatted.length - 1];
-              setLatestPrice(lastItem.price.toFixed(2));
-            }
         }
       } catch (error) {
         console.error("Error fetching chart:", error);
-        setLatestPrice("Error");
       } finally {
         setIsLoading(false);
       }
     };
 
-    if (symbol) {
-      fetchData();
-    }
+    fetchData();
   }, [symbol, timeRange]);
 
-  // Logic คำนวณสี
   const chartColor = useMemo(() => {
     if (chartData.length < 2) return "#22c55e";
-    
     const startPrice = chartData[0].price;
     const endPrice = chartData[chartData.length - 1].price;
-
     return endPrice >= startPrice ? "#22c55e" : "#ef4444";
   }, [chartData]);
 
+  // ใช้ข้อมูลจาก stockInfo
+  const currentPrice = stockInfo?.regularMarketPrice 
+    ? stockInfo.regularMarketPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+    : "-";
+
   return (
     <div className="flex flex-col gap-6 mt-8">
-      {/* Range filter (1D, 1M, ...) */}
       <div className="flex items-center gap-2">
         {ranges.map((range) => (
           <button
             key={range}
             onClick={() => setTimeRange(range)}
             className={`px-4 py-3 rounded-lg text-sm font-semibold transition-colors ${
-              timeRange === range
-                ? "bg-orange-500 text-white shadow-md"
-                : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+              timeRange === range ? "bg-orange-500 text-white shadow-md" : "bg-gray-100 text-gray-500 hover:bg-gray-200"
             }`}
           >
             {range}
@@ -113,10 +85,10 @@ export default function StockChart({ symbol, initialData = [] }: StockChartProps
       </div>
 
       <div className="flex flex-col lg:flex-row gap-8 items-stretch justify-between">
-        {/* Stock Chart */}
+        {/* Chart Area */}
         <div className="w-full lg:flex-1 h-[450px] bg-white rounded-xl border border-gray-200 shadow-sm p-4 relative min-w-0">
             {isLoading ? (
-            <div className="animate-pulse text-gray-400">Loading Chart...</div>
+            <div className="flex items-center justify-center h-full animate-pulse text-gray-400">Loading Chart...</div>
           ) : chartData.length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={chartData}>
@@ -127,67 +99,48 @@ export default function StockChart({ symbol, initialData = [] }: StockChartProps
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eee" />
-                <XAxis 
-                    dataKey="displayDate" 
-                    tick={{ fontSize: 12, fill: '#888' }} 
-                    minTickGap={30}
-                />
-                <YAxis 
-                    domain={['auto', 'auto']} 
-                    tick={{ fontSize: 12, fill: '#888' }}
-                    tickFormatter={(number) => number.toFixed(2)}
-                />
-                <Tooltip 
-                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                />
-                <Area 
-                    type="monotone" 
-                    dataKey="price" 
-                    stroke={chartColor}
-                    strokeWidth={2}
-                    fillOpacity={1} 
-                    fill="url(#colorPrice)" 
-                />
+                <XAxis dataKey="displayDate" tick={{ fontSize: 12, fill: '#888' }} minTickGap={30}/>
+                <YAxis domain={['auto', 'auto']} tick={{ fontSize: 12, fill: '#888' }} tickFormatter={(number) => number.toFixed(2)}/>
+                <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}/>
+                <Area type="monotone" dataKey="price" stroke={chartColor} strokeWidth={2} fillOpacity={1} fill="url(#colorPrice)" />
               </AreaChart>
             </ResponsiveContainer>
           ) : (
-            <p className="text-gray-400 font-medium">No Data Available</p>
+            <div className="flex items-center justify-center h-full text-gray-400 font-medium">No Data Available</div>
           )}
         </div>
 
-        {/* Stock Details */}
-        <div className="w-full lg:w-[350px] flex flex-col justify-between gap-4">          {/* Top Box */}
+        {/* Details Area */}
+        <div className="w-full lg:w-[350px] flex flex-col justify-between gap-4">
+          
           <div className="bg-white rounded-xl border border-gray-200 shadow-md shadow-[#247AE0] p-5">
-            <h3 className="text-gray-900 font-bold mb-2 pb-2">
-              ข้อมูลตลาดหุ้น
-            </h3>
+            <h3 className="text-gray-900 font-bold mb-2 pb-2">ข้อมูลตลาดหุ้น</h3>
             <div className="flex flex-col gap-3">
-              <RowItem label="ราคาหุ้นปัจจุบัน" value={latestPrice} />
-              <RowItem label="Market Cap" value={defaultMarketStats.marketCap} />
-              <RowItem label="Volume" value={defaultMarketStats.volume} />
-              <RowItem label="P/E" value={defaultMarketStats.pe} />
-              <RowItem label="P/BV" value={defaultMarketStats.pbv} />
+              <RowItem label="ราคาหุ้นปัจจุบัน" value={currentPrice} />
+              <RowItem label="Market Cap" value={stockInfo ? `${formatNumber(stockInfo.marketCap)}` : "N/A"} />
+              <RowItem label="Volume" value={stockInfo ? formatNumber(stockInfo.regularMarketVolume) : "N/A"} />
+              <RowItem label="P/E" value={stockInfo?.trailingPE ? `${stockInfo.trailingPE.toFixed(2)}x` : "N/A"} />
+              <RowItem label="P/BV" value={stockInfo?.priceToBook ? `${stockInfo.priceToBook.toFixed(2)}x` : (stockInfo?.pbv ? `${stockInfo.pbv.toFixed(2)}x` : "-")} />
             </div>
           </div>
 
-          {/* Bottom Box */}
           <div className="bg-white rounded-xl border border-gray-200 shadow-md shadow-[#247AE0] p-5">
-            <h3 className="text-gray-900 font-bold mb-2 pb-2">
-              ผลการดำเนินงานล่าสุด
-            </h3>
+            <h3 className="text-gray-900 font-bold mb-2 pb-2">ผลการดำเนินงานล่าสุด</h3>
             <div className="flex flex-col gap-3">
-              <RowItem label="รายได้รวม" value={financialStats.revenue} />
-              <RowItem label="กำไรสุทธิ" value={financialStats.netProfit} />
-              <RowItem label="กำไรต่อหุ้น" value={financialStats.eps} />
+              <RowItem label="รายได้รวม" value={stockInfo ? `${formatNumber(stockInfo.revenue)}` : "N/A"} />
+              <RowItem label="กำไรสุทธิ" value={stockInfo ? `${formatNumber(stockInfo.netProfit)}` : "N/A"} />
+              <RowItem label="กำไรต่อหุ้น (EPS)" value={stockInfo?.epsTrailingTwelveMonths ? `${stockInfo.epsTrailingTwelveMonths.toFixed(2)}` : (stockInfo?.eps ? `${stockInfo.eps.toFixed(2)}บาท` : "N/A")} />
             </div>
           </div>
+
         </div>
       </div>
     </div>
   );
 }
 
-// Helper function: ใช้ใน Stock Details ที่แสดงรายละเอียดหุ้น (Top box & bottom box)
+
+// Helper function: จัดเรียงข้อมูลหุ้น (row info)
 function RowItem({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex justify-between items-center text-sm">
@@ -196,3 +149,12 @@ function RowItem({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
+
+// Helper function: จัดรูปแบบตัวเลข
+const formatNumber = (num: number | undefined | null) => {
+  if (num === undefined || num === null) return "-";
+  if (num >= 1_000_000_000_000) return `${(num / 1_000_000_000_000).toFixed(2)} ล้านล้าน`;
+  if (num >= 1_000_000_000) return `${(num / 1_000_000_000).toFixed(2)} พันล้าน`;
+  if (num >= 1_000_000) return `${(num / 1_000_000).toFixed(2)} ล้าน`;
+  return num.toLocaleString();
+};
