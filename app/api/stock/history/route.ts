@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getStockHistory } from "@/lib/services/stock";
+import { getStockChartData } from "@/lib/services/stock";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -11,7 +11,7 @@ export async function GET(request: Request) {
   }
 
   // เรียกใช้ Logic จาก services
-  const data = await getStockHistory(symbol, range);
+  const data = await getStockChartData(symbol, range);
 
   if (!data || data.length === 0) {
       return NextResponse.json({ error: "Failed to fetch data" }, { status: 500 });
