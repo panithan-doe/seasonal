@@ -70,7 +70,7 @@ const StockCard = ({ stock }: StockProps) => {
          <div className="flex flex-row justify-between items-start mb-3">
           <div>
             
-            <div className='flex items-center justify-center rounded-lg bg-[#247AE0] mb-5'>
+            <div className='flex items-center justify-center rounded-lg bg-[#247AE0] mb-5 w-20'>
               <span className='text-sm font-medium text-white px-4 py-1'>
                 กันยายน  {/* TODO: Change this */}
               </span>
