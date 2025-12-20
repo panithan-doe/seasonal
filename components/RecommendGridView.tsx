@@ -3,13 +3,16 @@
 import React from "react";
 import StockCard from "@/components/StockCard";
 import NewsTable from "@/components/NewsTable";
-import QuarterHeader from "@/components/QuarterHeader";
-import { seasonalStocks, marketNews } from "@/lib/mockData";
+import { marketNews } from "@/lib/mockData";
 import Link from "next/link";
-import { ArrowRight, ChevronRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 
-export default function StockGridView() {
-  const displayedStocks = seasonalStocks.slice(0, 6);
+interface RecommendGridViewProps {
+  stocks: any[]; // รับ Array ของหุ้นเข้ามา
+}
+
+export default function RecommendGridView({ stocks }: RecommendGridViewProps) {
+  const displayedStocks = stocks; // ใช้หุ้นที่ได้รับจาก props (ถูก filter แล้ว)
 
   return (
     <div>

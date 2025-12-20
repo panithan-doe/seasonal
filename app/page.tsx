@@ -41,7 +41,10 @@ export default function Home() {
     // router.push จะเปลี่ยน URL โดยไม่ Reload หน้า (scroll: false คือไม่ให้เด้งขึ้นบนสุด)
     router.push(`${pathname}?${createQueryString("view", mode)}`, { scroll: false });
   };
-  
+
+  // Quarter selection state
+  const [selectedQuarter, setSelectedQuarter] = useState(3); // Default Q3 (รอเปลี่ยนเป็นไตรมาสปัจจุบัน)
+
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedCountry, setSelectedCountry] = useState("All");
@@ -49,17 +52,26 @@ export default function Home() {
   const categories = ["All", ...Array.from(new Set(seasonalStocks.map(s => s.category || "Other")))];
   const countries = ["All", "ไทย", "อเมริกา"]; // TODO: Change this later
 
+  // Filter stocks by selected quarter สำหรับ RecommendGridView (card view)
+  // แสดงแค่หุ้นที่เริ่มในไตรมาส (ไม่รวมหุ้นที่คาบเกี่ยวเข้ามา)
+  const displayedStocksForCards = (() => {
+    const startMonth = (selectedQuarter - 1) * 3; // Q1=0-2, Q2=3-5, Q3=6-8, Q4=9-11
+    const endMonth = startMonth + 2;
 
-
-  // Display only 6 stocks
-  const displayedStocks = seasonalStocks.slice(0, 6);
+    return seasonalStocks
+      .filter(stock => stock.month >= startMonth && stock.month <= endMonth)
+      .slice(0, 6); // แสดงแค่ 6 ตัวแรก
+  })();
 
   return (
     <main>
       {/* Header */}
       <Header />
 
-      <QuarterHeader />
+      <QuarterHeader
+        selectedQuarter={selectedQuarter}
+        onQuarterChange={setSelectedQuarter}
+      />
 
       
 
@@ -73,7 +85,7 @@ export default function Home() {
           <div className="flex flex-col">
             <div className="flex justify-start items-end text-[#247AE0] mb-6">
               <h2 className="text-2xl font-bold mr-1">แนะนำหุ้น</h2>
-              <span className="text-md pb-0.5">({displayedStocks.length})</span>
+              <span className="text-md pb-0.5">({displayedStocksForCards.length})</span>
             </div>
 
 
@@ -152,9 +164,9 @@ export default function Home() {
           
         {/* สลับหน้า Recommend : Dashboard */}
         {viewMode === "card" ? (
-            <RecommendGridView />
+            <RecommendGridView stocks={displayedStocksForCards} />
         ) : (
-            <StockDashboard stocks={displayedStocks}/>
+            <StockDashboard stocks={seasonalStocks} selectedQuarter={selectedQuarter} />
         )}
 
         

@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from 'react';
-import { CalendarDays } from 'lucide-react'; 
+import { CalendarDays } from 'lucide-react';
 
-export default function QuarterHeader() {
-  
-  // TODO: Change this later
-  const [activeQuarter, setActiveQuarter] = useState(3);
+interface QuarterHeaderProps {
+  selectedQuarter: number;
+  onQuarterChange: (quarter: number) => void;
+}
+
+export default function QuarterHeader({ selectedQuarter, onQuarterChange }: QuarterHeaderProps) {
 
   const quarters = [
     { id: 1, label: "ไตรมาส 1", period: "ม.ค. - มี.ค." },
@@ -33,12 +34,12 @@ export default function QuarterHeader() {
         <div className="flex items-center justify-evenly gap-6 overflow-x-auto py-2 no-scrollbar">
           
           {quarters.map((q) => {
-            const isActive = activeQuarter === q.id;
+            const isActive = selectedQuarter === q.id;
 
             return (
               <button
                 key={q.id}
-                onClick={() => setActiveQuarter(q.id)}
+                onClick={() => onQuarterChange(q.id)}
                 className={`
                   flex items-center gap-3 px-4 py-2 rounded-3xl transition-all duration-300 min-w-20 max-w-40 flex-1 cursor-pointer
                   ${isActive 

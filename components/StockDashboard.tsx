@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, ArrowRight, ArrowLeft } from "lucide-react";
 
 // นิยาม Type ให้ตรงกับ Mock Data ของคุณ
@@ -34,6 +34,7 @@ interface GanttBarData {
 
 interface StockDashboardProps {
   stocks: any[]; // รับ Array ของหุ้นเข้ามา
+  selectedQuarter: number; // รับไตรมาสที่เลือกจาก parent (1-4)
 }
 
 const thaiMonths = [
@@ -58,11 +59,44 @@ const isStockSpanningMonths = (stock: StockData, year: number): boolean => {
   return (stock.startDate + stock.duration - 1) > daysInMonth;
 };
 
+// Helper: คำนวณว่าหุ้นจบที่เดือนไหน (รองรับการคาบเกี่ยวหลายเดือน/ข้ามไตรมาส)
+const getStockEndMonth = (stock: StockData, year: number): number => {
+  let month = stock.month;
+  let day = stock.startDate;
+  let remainingDays = stock.duration;
 
-export default function StockDashboard({ stocks }: StockDashboardProps) {
+  while (remainingDays > 0) {
+    const daysInCurrentMonth = getDaysInMonth(year, month);
+    const daysAvailableInMonth = daysInCurrentMonth - day + 1;
 
-    // เริ่มวันที่ 1 เดือน 8 (กันยายน) ปี 2025
-    const [currentDate, setCurrentDate] = useState(new Date(2025, 8, 1));
+    if (remainingDays <= daysAvailableInMonth) {
+      // หุ้นจบในเดือนนี้
+      return month;
+    }
+
+    // ย้ายไปเดือนถัดไป
+    remainingDays -= daysAvailableInMonth;
+    month++;
+    day = 1; // เริ่มจากวันที่ 1 ของเดือนถัดไป
+  }
+
+  return month;
+};
+
+
+export default function StockDashboard({ stocks, selectedQuarter }: StockDashboardProps) {
+
+    // คำนวณเดือนเริ่มต้นจาก selectedQuarter
+    // Q1 = เดือน 0 (มกราคม), Q2 = เดือน 3 (เมษายน), Q3 = เดือน 6 (กรกฎาคม), Q4 = เดือน 9 (ตุลาคม)
+    const getInitialMonth = (quarter: number) => (quarter - 1) * 3;
+
+    const [currentDate, setCurrentDate] = useState(new Date(2025, getInitialMonth(selectedQuarter), 1));
+
+    // อัพเดท currentDate เมื่อ selectedQuarter เปลี่ยน
+    useEffect(() => {
+        const newMonth = getInitialMonth(selectedQuarter);
+        setCurrentDate(new Date(2025, newMonth, 1));
+    }, [selectedQuarter]);
 
     const currentMonthIndex = currentDate.getMonth();
     const currentYear = currentDate.getFullYear();
@@ -73,9 +107,16 @@ export default function StockDashboard({ stocks }: StockDashboardProps) {
     const endMonthOfQuarter = startMonthOfQuarter + 2;    // เช่น Q3 = 8 (กันยายน)
 
     // สร้าง sortedList เฉพาะหุ้นในไตรมาสปัจจุบัน เรียงตาม timeline
+    // รองรับหุ้นที่คาบเกี่ยวเข้ามาในไตรมาสนี้ด้วย
     const sortedList = useMemo(() => {
         return [...stocks]
-            .filter(stock => stock.month >= startMonthOfQuarter && stock.month <= endMonthOfQuarter) // กรองเฉพาะหุ้นในไตรมาสนี้
+            .filter(stock => {
+                // คำนวณเดือนที่หุ้นจบ
+                const endMonth = getStockEndMonth(stock, currentYear);
+                // เช็คว่าหุ้นมีส่วนที่อยู่ในไตรมาสนี้หรือไม่
+                // (เริ่มก่อนหรือในไตรมาส และจบในหรือหลังไตรมาส)
+                return endMonth >= startMonthOfQuarter && stock.month <= endMonthOfQuarter;
+            })
             .sort((a, b) => {
                 // เรียงตามเดือนก่อน
                 if (a.month !== b.month) return a.month - b.month;
@@ -84,7 +125,7 @@ export default function StockDashboard({ stocks }: StockDashboardProps) {
                 // ถ้าวันเดียวกัน เรียงตาม symbol
                 return a.symbol.localeCompare(b.symbol);
             });
-    }, [stocks, startMonthOfQuarter, endMonthOfQuarter]);
+    }, [stocks, startMonthOfQuarter, endMonthOfQuarter, currentYear]);
 
     // สร้าง index mapping จาก sortedList
     const stockIndexMap = useMemo(() => {
@@ -115,21 +156,13 @@ export default function StockDashboard({ stocks }: StockDashboardProps) {
     const nextMonthName = hasNextMonth ? thaiMonths[currentMonthIndex + 1] : "";
 
     // Filter หุ้นที่จะแสดงในเดือนปัจจุบัน
-    // รวมทั้งหุ้นที่เริ่มในเดือนนี้ และหุ้นที่เริ่มเดือนก่อนแต่คาบเกี่ยวมาถึงเดือนนี้
+    // รองรับหุ้นที่คาบเกี่ยวหลายเดือน/ข้ามไตรมาส
     const monthlyStocks = useMemo(() => {
         return stocks.filter(stock => {
-            // กรณีที่ 1: หุ้นเริ่มในเดือนนี้
-            if (stock.month === currentMonthIndex) {
-                return true;
-            }
-
-            // กรณีที่ 2: หุ้นเริ่มเดือนก่อนหน้า และคาบเกี่ยวมาถึงเดือนนี้
-            if (stock.month === currentMonthIndex - 1) {
-                const isSpanning = isStockSpanningMonths(stock, currentYear);
-                return isSpanning;
-            }
-
-            return false;
+            // คำนวณเดือนที่หุ้นจบ
+            const endMonth = getStockEndMonth(stock, currentYear);
+            // เช็คว่าเดือนปัจจุบันอยู่ในช่วงของหุ้นหรือไม่
+            return currentMonthIndex >= stock.month && currentMonthIndex <= endMonth;
         });
     }, [stocks, currentMonthIndex, currentYear]);
 
@@ -151,7 +184,7 @@ export default function StockDashboard({ stocks }: StockDashboardProps) {
 
       // หุ้นมีในเดือนนี้ → คำนวณ bar data
       const daysInCurrentMonth = getDaysInMonth(currentYear, currentMonthIndex);
-      const daysInStockMonth = getDaysInMonth(currentYear, stock.month);
+      const endMonth = getStockEndMonth(stock, currentYear);
 
       let start = stock.startDate;
       let duration = stock.duration;
@@ -175,10 +208,26 @@ export default function StockDashboard({ stocks }: StockDashboardProps) {
         isContinuation = true;
         start = 1; // เริ่มต้นที่วันที่ 1 ของเดือนนี้
 
-        // คำนวณว่าเหลืออีกกี่วันที่ต้องแสดง
-        const daysUsedInPreviousMonth = daysInStockMonth - stock.startDate + 1;
-        const remainingDays = stock.duration - daysUsedInPreviousMonth;
+        // คำนวณว่าใช้ไปกี่วันแล้วในทุกเดือนก่อนหน้า
+        let daysUsed = 0;
+        let m = stock.month;
+        let d = stock.startDate;
+
+        while (m < currentMonthIndex) {
+          const daysInMonth = getDaysInMonth(currentYear, m);
+          daysUsed += daysInMonth - d + 1;
+          m++;
+          d = 1; // เดือนถัดไปเริ่มจากวันที่ 1
+        }
+
+        // คำนวณว่าเหลืออีกกี่วันที่ต้องแสดงในเดือนปัจจุบัน
+        const remainingDays = stock.duration - daysUsed;
         duration = Math.min(remainingDays, daysInCurrentMonth);
+
+        // เช็คว่ายังมีต่อในเดือนถัดไปหรือไม่
+        if (remainingDays > daysInCurrentMonth) {
+          hasNext = true;
+        }
       }
 
       return {
