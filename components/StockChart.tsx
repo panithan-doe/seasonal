@@ -76,7 +76,7 @@ export default function StockChart({ symbol, initialData = [], stockInfo }: Stoc
             key={range}
             onClick={() => setTimeRange(range)}
             className={`px-4 py-3 rounded-lg text-sm font-semibold transition-colors ${
-              timeRange === range ? "bg-orange-500 text-white shadow-md" : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+              timeRange === range ? "bg-[#eb8a01] text-white shadow-md" : "bg-gray-100 text-gray-500 hover:bg-gray-200"
             }`}
           >
             {range}
@@ -113,7 +113,7 @@ export default function StockChart({ symbol, initialData = [], stockInfo }: Stoc
         {/* Details Area */}
         <div className="w-full lg:w-[350px] flex flex-col justify-between gap-4">
           
-          <div className="bg-white rounded-xl border border-gray-200 shadow-md shadow-[#247AE0] p-5">
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5 pb-8">
             <h3 className="text-gray-900 font-bold mb-2 pb-2">ข้อมูลตลาดหุ้น</h3>
             <div className="flex flex-col gap-3">
               <RowItem label="ราคาหุ้นปัจจุบัน" value={currentPrice} />
@@ -124,7 +124,7 @@ export default function StockChart({ symbol, initialData = [], stockInfo }: Stoc
             </div>
           </div>
 
-          <div className="bg-white rounded-xl border border-gray-200 shadow-md shadow-[#247AE0] p-5">
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5 pb-8">
             <h3 className="text-gray-900 font-bold mb-2 pb-2">ผลการดำเนินงานล่าสุด</h3>
             <div className="flex flex-col gap-3">
               <RowItem label="รายได้รวม" value={stockInfo ? `${formatNumber(stockInfo.revenue)}` : "N/A"} />

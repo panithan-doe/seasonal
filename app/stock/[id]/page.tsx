@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import Header from "@/components/Header";
 import StockChart from "@/components/StockChart";
 import { getStockData } from "@/lib/services/stock";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -55,9 +57,17 @@ export default async function StockDetail({ params }: PageProps) {
     <main>
       <Header />
 
-      <div className="min-h-screen bg-gray-50 py-6 px-10 xl:px-30">        
-        
-        <div className="pb-6 mb-2">
+      <div className="min-h-screen bg-gray-50 py-6 px-10 xl:px-30">
+
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 text-gray-600 hover:text-[#247AE0] transition-colors group mb-6"
+        >
+          <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+          <span className="font-semibold">ย้อนกลับ</span>
+        </Link>
+
+        <div className="pb-6 mb-2 mt-4">
           <h1 className="text-5xl font-bold text-gray-900">{symbol}</h1>
           <p className="text-xl text-gray-500 mt-2 font-semibold">{stockName}</p>
         </div>
@@ -66,7 +76,7 @@ export default async function StockDetail({ params }: PageProps) {
           <h1 className="text-[#4285F4] font-extrabold text-2xl">ภาพรวมหุ้น</h1>
         </div>
         
-        <div className="bg-white rounded-xl shadow-md shadow-[#4285F4] p-8">
+        <div className="bg-white rounded-xl shadow-sm p-8">
           <div className="flex flex-col md:justify-between md:flex-row md:items-start">
             
             <div className="flex flex-col items-start md:flex-row md:items-start">

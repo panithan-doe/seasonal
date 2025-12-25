@@ -2,6 +2,7 @@
 
 import React, { useMemo, useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, ArrowRight, ArrowLeft } from "lucide-react";
+import StockTooltip from "./StockTooltip";
 
 // นิยาม Type ให้ตรงกับ Mock Data ของคุณ
 interface StockData {
@@ -92,6 +93,20 @@ export default function StockDashboard({ stocks, selectedQuarter }: StockDashboa
 
     const [currentDate, setCurrentDate] = useState(new Date(2025, getInitialMonth(selectedQuarter), 1));
 
+    // Tooltip state
+    // 🔧 DEV: เปลี่ยน visible: false, stock: null เมื่อต้องการปิด tooltip
+    const [tooltip, setTooltip] = useState<{
+        visible: boolean;
+        x: number;
+        y: number;
+        stock: StockData | null;
+    }>({
+        visible: false,
+        x: 0,
+        y: 0,
+        stock: null
+    });
+
     // อัพเดท currentDate เมื่อ selectedQuarter เปลี่ยน
     useEffect(() => {
         const newMonth = getInitialMonth(selectedQuarter);
@@ -146,6 +161,35 @@ export default function StockDashboard({ stocks, selectedQuarter }: StockDashboa
         if (currentMonthIndex < endMonthOfQuarter) {
             setCurrentDate(new Date(currentYear, currentMonthIndex + 1, 1));
         }
+    };
+
+    // Tooltip handlers
+    const handleMouseEnter = (stock: StockData, e: React.MouseEvent) => {
+        setTooltip({
+            visible: true,
+            x: e.clientX,
+            y: e.clientY,
+            stock
+        });
+    };
+
+    const handleMouseMove = (e: React.MouseEvent) => {
+        if (tooltip.visible) {
+            setTooltip(prev => ({
+                ...prev,
+                x: e.clientX,
+                y: e.clientY
+            }));
+        }
+    };
+
+    const handleMouseLeave = () => {
+        setTooltip({
+            visible: false,
+            x: 0,
+            y: 0,
+            stock: null
+        });
     };
 
     const hasPrevMonth = currentMonthIndex > startMonthOfQuarter;
@@ -236,7 +280,7 @@ export default function StockDashboard({ stocks, selectedQuarter }: StockDashboa
         start,
         duration,
         percent: stock.changePercent > 0 ? `+${stock.changePercent}%` : `${stock.changePercent}%`,
-        color: "bg-[#247AE0]",
+        color: "bg-[#1f40af]",
         isContinuation,
         hasNext,
         originalStock: stock
@@ -309,13 +353,13 @@ export default function StockDashboard({ stocks, selectedQuarter }: StockDashboa
       {/* Gantt Area */}
       <div className="bg-white rounded-b-lg shadow-sm border border-gray-200 overflow-x-auto mb-8">
         
-        {/* ✅ เพิ่ม: แสดงข้อความเมื่อไม่มีข้อมูลในเดือนนั้น */}
+        {/* เพิ่ม: แสดงข้อความเมื่อไม่มีข้อมูลในเดือนนั้น */}
         {monthlyStocks.length === 0 ? (
             <div className="p-10 text-center text-gray-400">
                 ไม่มีข้อมูลหุ้นแนะนำในเดือน{thaiMonths[currentMonthIndex]}
             </div>
         ) : (
-            <div className="min-w-[800px]">
+            <div className="min-w-200">
                 {/* Header: แสดงตัวเลขวันที่ตามจำนวนวันจริง */}
                 {(() => {
                     const daysInMonth = getDaysInMonth(currentYear, currentMonthIndex);
@@ -379,20 +423,25 @@ export default function StockDashboard({ stocks, selectedQuarter }: StockDashboa
                                 width: `${(item.duration / daysInMonth) * 100}%`
                             }}
                         >
-                            <div className={`${item.color} text-white text-[10px] md:text-xs font-semibold w-full h-full rounded flex items-center justify-between shadow-sm overflow-hidden px-2`}>
+                            <div
+                                className={`${item.color} text-white text-[10px] md:text-xs font-semibold w-full h-full rounded flex items-center justify-between shadow-sm overflow-hidden px-2 cursor-pointer hover:opacity-90 transition-opacity`}
+                                onMouseEnter={(e) => handleMouseEnter(item.originalStock, e)}
+                                onMouseMove={handleMouseMove}
+                                onMouseLeave={handleMouseLeave}
+                            >
                                 {/* แสดง Arrow Left ถ้าต่อมาจากเดือนก่อน */}
                                 {item.isContinuation && (
-                                    <ArrowLeft className="w-3 h-3 md:w-4 md:h-4 flex-shrink-0 opacity-80" />
+                                    <ArrowLeft className="w-3 h-3 md:w-4 md:h-4 shrink-0 opacity-80" />
                                 )}
 
                                 {/* ข้อความกลาง */}
                                 <span className="whitespace-nowrap px-1 flex-1 text-center">
-                                    {item.duration}วัน / {item.name} ({item.percent})
+                                    {item.originalStock.duration}วัน / {item.name} ({item.percent})
                                 </span>
 
                                 {/* แสดง Arrow Right ถ้ายังมีต่อในเดือนถัดไป */}
                                 {item.hasNext && (
-                                    <ArrowRight className="w-3 h-3 md:w-4 md:h-4 flex-shrink-0 opacity-80" />
+                                    <ArrowRight className="w-3 h-3 md:w-4 md:h-4 shrink-0 opacity-80" />
                                 )}
                             </div>
                         </div>
@@ -467,6 +516,15 @@ export default function StockDashboard({ stocks, selectedQuarter }: StockDashboa
              </div>
         </div>
       </div>
+
+      {/* Tooltip */}
+      <StockTooltip
+        visible={tooltip.visible}
+        x={tooltip.x}
+        y={tooltip.y}
+        stock={tooltip.stock}
+        monthName={thaiMonths[currentMonthIndex]}
+      />
     </div>
   );
 }

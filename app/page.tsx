@@ -7,7 +7,7 @@ import QuarterHeader from "@/components/QuarterHeader";
 import { seasonalStocks } from "@/lib/mockData";
 // import { marketNews } from "@/lib/mockData";
 // import Link from 'next/link';
-import { ArrowRight, LayoutGrid, BarChart2, Search } from 'lucide-react';
+import { ArrowRight, LayoutGrid, BarChart2, Search, ChevronDown } from 'lucide-react';
 import { useState, useCallback } from 'react';
 import FilterDropdown from "@/components/FilterDropdown";
 import RecommendGridView from "@/components/RecommendGridView"
@@ -130,7 +130,7 @@ export default function Home() {
 
               {/* Search & Filter */}
               <div className="flex gap-2 md:w-auto justify-end">
-                <div className="relative w-full md:w-60">
+                {/* <div className="relative w-full md:w-60">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <Search className="h-4 w-4 text-gray-400" />
                   </div>
@@ -141,9 +141,9 @@ export default function Home() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
-                </div>
+                </div> */}
                 
-                <FilterDropdown
+                < FilterDropdown
                   options={categories}
                   value={selectedCategory}
                   onChange={setSelectedCategory}

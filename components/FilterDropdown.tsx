@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Triangle } from "lucide-react";
+import { Triangle, ChevronDown } from "lucide-react";
 
 interface CustomDropdownProps {
   options: string[];
@@ -50,12 +50,17 @@ export default function FilterDropdown({
         }`}
       >
         <span className="truncate">{displayValue}</span>
-        <Triangle
+        {/* <Triangle
           fill="gray"
           stroke="none"
           style={{ transform: isOpen ? 'rotate(0deg)' : 'rotate(180deg)' }}
           className="transition-transform duration-200 ml-2 shrink-0"
           size={10}
+        /> */}
+        <ChevronDown
+          style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
+          className="transition-transform duration-200 ml-2 shrink-0"
+          size={16}
         />
       </button>
 

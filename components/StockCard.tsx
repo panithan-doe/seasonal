@@ -76,7 +76,7 @@ const StockCard = ({ stock }: StockProps) => {
               </span>
             </div>
 
-            <h4 className='text-xs text-gray-400'>{stock.category}</h4>
+            <h4 className='text-sm text-gray-500 mb-4'>{stock.category}</h4>
             <h3 className="text-3xl font-bold text-gray-900">{stock.symbol}</h3>
           </div>
      
@@ -99,15 +99,15 @@ const StockCard = ({ stock }: StockProps) => {
             
             {/* Price */}
             <div className='flex flex-col gap-2'>
-              <h4 className="text-xs font-extrabold text-gray-400">ราคาปัจจุบัน</h4>
+              <h4 className="text-sm text-gray-500">ราคาปัจจุบัน</h4>
               <span className="text-xl font-bold text-[#247AE0]">
-                THB{stock.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                USD{stock.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}
               </span>
             </div>
 
             {/* Change & Loss */}
             <div className='flex flex-col items-end gap-2'>
-              <h4 className="text-xs font-extrabold text-gray-400">เปลี่ยนแปลงจากวันที่แนะนำ</h4>
+              <h4 className="text-sm text-gray-500">เปลี่ยนแปลงจากวันที่แนะนำ</h4>
               <div className={`flex items-center mt-1 gap-1 text-xl font-semibold ${trendColor}`}>
                 <TrendingUp/>
                 <span>
@@ -135,8 +135,8 @@ const StockCard = ({ stock }: StockProps) => {
           <div className='flex flex-row w-full justify-between items-end'>
             {/* เติบโตได้ดีในช่วง */}
             <div>
-              <h4 className="text-xs font-extrabold text-gray-400">เติบโตได้ดีในช่วง</h4>
-              <h4 className="text-xs font-extrabold text-gray-400">{growthPeriod}</h4>        {/* Need to change*/}
+              <h4 className="text-sm text-gray-500">เติบโตได้ดีในช่วง</h4>
+              <h4 className="text-sm text-[#247AE0]">{growthPeriod}</h4>        {/* Need to change*/}
             </div>
 
             {/* Button */}
