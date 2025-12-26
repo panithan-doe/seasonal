@@ -76,7 +76,7 @@ export default function StockChart({ symbol, initialData = [], stockInfo }: Stoc
             key={range}
             onClick={() => setTimeRange(range)}
             className={`px-4 py-3 rounded-lg text-sm font-semibold transition-colors ${
-              timeRange === range ? "bg-[#eb8a01] text-white shadow-md" : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+              timeRange === range ? "bg-[#eb8a01] text-white shadow-md" : "bg-gray-200 text-gray-500 hover:bg-gray-300"
             }`}
           >
             {range}

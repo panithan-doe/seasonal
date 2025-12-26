@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, ArrowRight, ArrowLeft } from "lucide-react";
-import StockTooltip from "./StockTooltip";
+import StockTooltip from "./Tooltip";
 
 // นิยาม Type ให้ตรงกับ Mock Data ของคุณ
 interface StockData {
@@ -310,9 +310,7 @@ export default function StockDashboard({ stocks, selectedQuarter }: StockDashboa
           symbol: stock.symbol,
           date: dateString,
           days: stock.duration, // แสดงจำนวนวันรวมทั้งหมด
-          daysDisplay: isSpanning
-            ? `${stock.duration} (${daysInMonth - stock.startDate + 1}→${stock.duration - (daysInMonth - stock.startDate + 1)})`
-            : stock.duration, // ถ้าคาบเกี่ยว แสดงว่าแบ่งเป็น 2 เดือน
+          daysDisplay: stock.duration,
           price: stock.price,
           change: isPositive ? `+${stock.changePercent}%` : `${stock.changePercent}%`,
           signal: stock.signal,
@@ -329,18 +327,18 @@ export default function StockDashboard({ stocks, selectedQuarter }: StockDashboa
       
       {/* Month Navigation */}
       {/* แก้ไขส่วนนี้: ผูก onClick และแสดงชื่อเดือนตาม logic */}
-      <div className="flex justify-between items-center text-gray-400 text-sm mb-2 h-6 select-none">
+      <div className="flex justify-between items-center text-gray-500 text-sm mb-4 h-6 select-none">
         <div 
             onClick={handlePrevMonth}
-            className={`flex items-center cursor-pointer hover:text-[#247AE0] transition-colors ${!hasPrevMonth ? "invisible" : ""}`}
+            className={`flex items-center justify-start w-26 cursor-pointer hover:text-[#247AE0] transition-colors ${!hasPrevMonth ? "invisible" : ""}`}
         >
-            <ChevronLeft className="w-4 h-4" /> {prevMonthName}
+            <ChevronLeft className="w-8 h-8 text-[#247AE0]" /> {prevMonthName}
         </div>
         <div 
             onClick={handleNextMonth}
-            className={`flex items-center cursor-pointer hover:text-[#247AE0] transition-colors ${!hasNextMonth ? "invisible" : ""}`}
+            className={`flex items-center justify-end w-26 cursor-pointer hover:text-[#247AE0] transition-colors ${!hasNextMonth ? "invisible" : ""}`}
         >
-            {nextMonthName} <ChevronRight className="w-4 h-4" />
+            {nextMonthName} <ChevronRight className="w-8 h-8 text-[#247AE0]" />
         </div>
       </div>
 
@@ -362,16 +360,23 @@ export default function StockDashboard({ stocks, selectedQuarter }: StockDashboa
             <div className="min-w-200">
                 {/* Header: แสดงตัวเลขวันที่ตามจำนวนวันจริง */}
                 {(() => {
-                    const daysInMonth = getDaysInMonth(currentYear, currentMonthIndex);
-                    return (
-                        <div className="grid border-b" style={{ gridTemplateColumns: `repeat(${daysInMonth}, minmax(0, 1fr))` }}>
-                            {Array.from({ length: daysInMonth }, (_, i) => (
-                                <div key={i} className={`text-[10px] md:text-xs text-center py-2 border-r ${i + 1 === daysInMonth ? 'bg-orange-400 text-white' : 'text-gray-500'}`}>
-                                    {i + 1}
-                                </div>
-                            ))}
-                        </div>
-                    );
+                  const daysInMonth = getDaysInMonth(currentYear, currentMonthIndex);
+                  const today = new Date();
+                  const isCurrentMonth = currentMonthIndex === today.getMonth() && currentYear === today.getFullYear();
+
+                  return (
+                    <div className="grid border-b" style={{ gridTemplateColumns: `repeat(${daysInMonth}, minmax(0, 1fr))` }}>
+                      {Array.from({ length: daysInMonth }, (_, i) => {
+                        const isToday = isCurrentMonth && (i + 1) === today.getDate();
+
+                        return (
+                          <div key={i} className={`text-[10px] md:text-xs text-center py-2 border-r ${isToday ? 'bg-[#eb8a01] text-white' : 'text-gray-500'}`}>
+                              {i + 1}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
                 })()}
 
                 <div className="relative py-4 space-y-3 px-1">
@@ -463,7 +468,7 @@ export default function StockDashboard({ stocks, selectedQuarter }: StockDashboa
                         <tr>
                             <th className="py-3 pl-2 text-[#247AE0]">หุ้น</th>
                             <th className="py-3 text-[#247AE0]">วันที่ประกาศ</th>
-                            <th className="py-3 text-[#247AE0]">วันแนะนำ<br/><span className="text-[10px] text-gray-400">(จำนวนวัน)</span></th>
+                            <th className="py-3 text-[#247AE0]">วันแนะนำ<br/><span className="text-[10px]">(จำนวนวัน)</span></th>
                             <th className="py-3 text-[#247AE0]">ราคา</th>
                             <th className="py-3 text-[#247AE0]">เปลี่ยนแปลง</th>
                             <th className="py-3 text-[#247AE0]">สัญญาณ</th>

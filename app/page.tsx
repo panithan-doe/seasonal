@@ -43,7 +43,9 @@ export default function Home() {
   };
 
   // Quarter selection state
-  const [selectedQuarter, setSelectedQuarter] = useState(3); // Default Q3 (รอเปลี่ยนเป็นไตรมาสปัจจุบัน)
+  const [selectedQuarter, setSelectedQuarter] = useState(
+    Math.floor(new Date().getMonth() / 3) + 1   // Current Quarter
+  );
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");

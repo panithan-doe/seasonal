@@ -59,13 +59,13 @@ export default async function StockDetail({ params }: PageProps) {
 
       <div className="min-h-screen bg-gray-50 py-6 px-10 xl:px-30">
 
-        <Link
+        {/* <Link
           href="/"
           className="inline-flex items-center gap-2 text-gray-600 hover:text-[#247AE0] transition-colors group mb-6"
         >
           <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
           <span className="font-semibold">ย้อนกลับ</span>
-        </Link>
+        </Link> */}
 
         <div className="pb-6 mb-2 mt-4">
           <h1 className="text-5xl font-bold text-gray-900">{symbol}</h1>

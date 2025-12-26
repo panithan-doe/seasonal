@@ -52,11 +52,11 @@ export default function StockTooltip({ visible, x, y, stock, monthName }: StockT
         top: `${y + 15}px`,
       }}
     >
-      <div className="bg-white border-2 border-gray-300 rounded-xl shadow-2xl p-4 min-w-[300px] max-w-[350px]">
+      <div className="bg-white border-2 border-gray-300 rounded-xl shadow-2xl p-4 min-w-75 max-w-90">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <div className="flex items-center justify-center rounded-lg bg-[#247AE0] px-2 py-0.5 mb-3">
+            <div className="flex items-center justify-center rounded-lg bg-[#247AE0] px-2 py-0.5 mb-3 w-20">
               <span className="text-xs font-medium text-white">
                 {thaiMonths[stock.month]}
               </span>
