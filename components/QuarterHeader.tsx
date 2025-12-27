@@ -3,11 +3,11 @@
 import { CalendarDays } from 'lucide-react';
 
 interface QuarterHeaderProps {
-  selectedQuarter: number;
-  onQuarterChange: (quarter: number) => void;
+  selectedQuarter?: number | null;
+  onQuarterChange?: (quarter: number) => void;
 }
 
-export default function QuarterHeader({ selectedQuarter, onQuarterChange }: QuarterHeaderProps) {
+export default function QuarterHeader({ selectedQuarter = null, onQuarterChange }: QuarterHeaderProps) {
 
   const quarters = [
     { id: 1, label: "ไตรมาส 1", period: "ม.ค. - มี.ค." },
@@ -39,7 +39,7 @@ export default function QuarterHeader({ selectedQuarter, onQuarterChange }: Quar
             return (
               <button
                 key={q.id}
-                onClick={() => onQuarterChange(q.id)}
+                onClick={() => onQuarterChange?.(q.id)}
                 className={`
                   flex items-center gap-3 px-4 py-2 rounded-3xl transition-all duration-300 min-w-20 max-w-40 flex-1 cursor-pointer
                   ${isActive 

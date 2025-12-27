@@ -31,10 +31,10 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       <AnimatePresence>
         {toast && (
           <motion.div
-            initial={{ opacity: 0, y: 50, scale: 0.9 }}
+            initial={{ opacity: 0, y: -50, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.9 }}
-            className="fixed bottom-10 left-1/2 transform -translate-x-1/2 z-100 flex items-center gap-3 px-6 py-3 bg-white text-gray-900 shadow-2xl shadow-gray-900"
+            exit={{ opacity: 0, y: -20, scale: 0.9 }}
+            className="fixed top-10 left-1/2 transform -translate-x-1/2 z-100 flex items-center gap-3 px-6 py-3 bg-white text-gray-900 shadow-2xl shadow-gray-900"
           >
             {toast.type === "success" ? (
               <CheckCircle className="text-green-400" size={20} />

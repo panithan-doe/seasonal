@@ -4,6 +4,7 @@ import StockChart from "@/components/StockChart";
 import { getStockData } from "@/lib/services/stock";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import WatchlistButton from "@/components/WatchlistButton";
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -68,7 +69,10 @@ export default async function StockDetail({ params }: PageProps) {
         </Link> */}
 
         <div className="pb-6 mb-2 mt-4">
-          <h1 className="text-5xl font-bold text-gray-900">{symbol}</h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-5xl font-bold text-gray-900">{symbol}</h1>
+            <WatchlistButton symbol={symbol} size={32} />
+          </div>
           <p className="text-xl text-gray-500 mt-2 font-semibold">{stockName}</p>
         </div>
 

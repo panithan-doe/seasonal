@@ -16,7 +16,7 @@ export default function RecommendGridView({ stocks }: RecommendGridViewProps) {
 
   return (
     <div>
-      <section className="max-w-7xl mx-auto mb-16">
+      <section className="mx-auto mb-16">
         <div className="flex items-center justify-end text-sm font-semibold mb-4">
           <Link 
             href="/seasonstock" 
@@ -34,7 +34,7 @@ export default function RecommendGridView({ stocks }: RecommendGridViewProps) {
         </div>
       </section>
 
-      <section className="max-w-7xl mx-auto">
+      <section className="mx-auto">
         <h2 className="text-2xl font-bold text-[#247AE0] mb-4">
           ข่าวสารหุ้น
         </h2>

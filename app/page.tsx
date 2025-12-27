@@ -81,7 +81,7 @@ export default function Home() {
       <div className="min-h-screen bg-gray-50 p-6 md:p-12">
         
 
-        <section className="max-w-7xl mx-auto mb-16">
+        <section className="max-w-10/12 mx-auto mb-16">
 
           {/* Header Section */}
           <div className="flex flex-col">

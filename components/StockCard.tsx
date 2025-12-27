@@ -1,10 +1,9 @@
 "use client";
 
-import { useState } from 'react';
 import Link from 'next/link';
-import { Star, TrendingUp } from 'lucide-react'
+import { TrendingUp } from 'lucide-react'
 import { percent } from 'framer-motion';
-import { useToast } from '@/context/ToastContext';
+import WatchlistButton from './WatchlistButton';
 
 interface StockProps {
   stock: {
@@ -19,34 +18,14 @@ interface StockProps {
 }
 
 const StockCard = ({ stock }: StockProps) => {
-  
-  const [isWatchlist, setIsWatchlist] = useState(stock.isWatchlist)
 
   const isPositive = stock.changePercent >= 0;  // green for POSITIVE, red for NEGATIVE
   const trendColor = isPositive ? 'text-green-600' : 'text-red-600';
   const trendSign = isPositive ? '+' : '';
-  const isWatchlistColor = isWatchlist ? 'text-[#ecc353]' : 'text-gray-300';
   const priceChange = (stock.price * stock.changePercent) / 100;
   const growthPeriod = "กรกฏาคม-กันยายน"; // TODO: Need to change
-  const { showToast } = useToast();
 
   // const lossColor = stock.percentLoss <= 5 ? 'text-green-600' : 'text-yellow-600';
-
-
-  const handleToggleWatchlist = (e: React.MouseEvent) => {
-    e.preventDefault(); // ป้องกันไม่ให้ลิงก์ทำงาน
-    e.stopPropagation(); // ป้องกันไม่ให้เหตุการณ์ฟองสบู่ขึ้นไปยังองค์ประกอบพาเรนต์
-    
-    const newState = !isWatchlist;
-    setIsWatchlist(newState);
-
-    if (newState) {
-      showToast(`${stock.symbol} ถูกเพิ่มใน Watchlist`, "success");
-    } else {
-      showToast(`${stock.symbol} ถูกลบออกจาก Watchlist`, "error");
-    }
-
-  }
 
 
   return (
@@ -76,19 +55,14 @@ const StockCard = ({ stock }: StockProps) => {
               </span>
             </div>
 
-            <h4 className='text-sm text-gray-500 mb-4'>{stock.category}</h4>
+            <h4 className='text-sm text-gray-500 font-semibold mb-4'>{stock.category}</h4>
             <h3 className="text-3xl font-bold text-gray-900">{stock.symbol}</h3>
           </div>
-     
-          <button
-            onClick={handleToggleWatchlist}
-            className="p-1 rounded-full hover:bg-gray-100 transition-colors focus:outline-none z-10"            >
-            <Star
-              className={isWatchlistColor}
-              fill="currentColor"
-              strokeWidth={0.1}
-            />
-          </button>
+
+          <WatchlistButton
+            symbol={stock.symbol}
+            initialIsWatchlist={stock.isWatchlist}
+          />
         </div>
 
 
@@ -99,15 +73,15 @@ const StockCard = ({ stock }: StockProps) => {
             
             {/* Price */}
             <div className='flex flex-col gap-2'>
-              <h4 className="text-sm text-gray-500">ราคาปัจจุบัน</h4>
+              <h4 className="text-sm text-gray-500 font-semibold">ราคาปัจจุบัน</h4>
               <span className="text-xl font-bold text-[#247AE0]">
-                USD{stock.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                USD {stock.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}
               </span>
             </div>
 
             {/* Change & Loss */}
             <div className='flex flex-col items-end gap-2'>
-              <h4 className="text-sm text-gray-500">เปลี่ยนแปลงจากวันที่แนะนำ</h4>
+              <h4 className="text-sm text-gray-500 font-semibold">เปลี่ยนแปลงจากวันที่แนะนำ</h4>
               <div className={`flex items-center mt-1 gap-1 text-xl font-semibold ${trendColor}`}>
                 <TrendingUp/>
                 <span>
@@ -135,8 +109,8 @@ const StockCard = ({ stock }: StockProps) => {
           <div className='flex flex-row w-full justify-between items-end'>
             {/* เติบโตได้ดีในช่วง */}
             <div>
-              <h4 className="text-sm text-gray-500">เติบโตได้ดีในช่วง</h4>
-              <h4 className="text-sm text-[#247AE0]">{growthPeriod}</h4>        {/* Need to change*/}
+              <h4 className="text-sm text-gray-500 font-semibold">เติบโตได้ดีในช่วง</h4>
+              <h4 className="text-sm text-[#247AE0] font-semibold">{growthPeriod}</h4>        {/* Need to change*/}
             </div>
 
             {/* Button */}

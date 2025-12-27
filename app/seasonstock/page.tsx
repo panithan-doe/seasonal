@@ -11,40 +11,64 @@ import FilterDropdown from '@/components/FilterDropdown';
 
 export default function SeasonStock() {
 
+  // คำนวณไตรมาสปัจจุบัน (1-4)
+  const getCurrentQuarter = () => {
+    const currentMonth = new Date().getMonth(); // 0-11
+    return Math.floor(currentMonth / 3) + 1; // 1-4
+  };
+
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedCountry, setSelectedCountry] = useState("All");
+  const [selectedQuarter, setSelectedQuarter] = useState<number | null>(getCurrentQuarter());
 
   // const categories = ["All", ...Array.from(new Set(seasonalStocks.map(s => s.category || "Other")))];
   const categories = ["All", ...Array.from(new Set(seasonalStocks.map(s => s.category || "Other")))];
   
   const countries = ["All", "ไทย", "อเมริกา"]; // TODO: Change this later
 
+  // Handler สำหรับเปลี่ยนไตรมาส (รองรับ toggle)
+  const handleQuarterChange = (quarter: number) => {
+    if (selectedQuarter === quarter) {
+      // ถ้ากดไตรมาสที่เลือกอยู่อีกครั้ง → ยกเลิก (แสดงทั้งหมด)
+      setSelectedQuarter(null);
+    } else {
+      setSelectedQuarter(quarter);
+    }
+  };
+
   const filteredStocks = useMemo(() => {
     return seasonalStocks.filter((stock) => {
       // กรองตามชื่อหรือ symbol
-      const matchesSearch = 
+      const matchesSearch =
         stock.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
         stock.name.toLowerCase().includes(searchQuery.toLowerCase());
 
       // กรองตามหมวดหมู่
-      const matchesCategory = 
+      const matchesCategory =
         selectedCategory === "All" || stock.category === selectedCategory;
 
       // กรองตามประเทศ (ถ้าใน data ยังไม่มี field country ให้ข้ามไปก่อน หรือใส่ logic เพิ่ม)
-      const matchesCountry = 
+      const matchesCountry =
         selectedCountry === "All" || (stock as any).country === selectedCountry;
 
-      return matchesSearch && matchesCategory && matchesCountry;
+      // กรองตามไตรมาส (ถ้าไม่ได้เลือก = แสดงทั้งหมด)
+      const matchesQuarter =
+        selectedQuarter === null || Math.floor(stock.month / 3) + 1 === selectedQuarter;
+
+      return matchesSearch && matchesCategory && matchesCountry && matchesQuarter;
     });
-  }, [searchQuery, selectedCategory, selectedCountry]);
+  }, [searchQuery, selectedCategory, selectedCountry, selectedQuarter]);
 
 
   return (
     <main>
       <Header />
 
-      <QuarterHeader />
+      <QuarterHeader
+        selectedQuarter={selectedQuarter}
+        onQuarterChange={handleQuarterChange}
+      />
       
 
       <div className="min-h-screen bg-gray-50 p-6 md:p-12">

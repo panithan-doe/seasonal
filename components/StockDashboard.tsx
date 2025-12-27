@@ -3,6 +3,7 @@
 import React, { useMemo, useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, ArrowRight, ArrowLeft } from "lucide-react";
 import StockTooltip from "./Tooltip";
+import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 
 // นิยาม Type ให้ตรงกับ Mock Data ของคุณ
 interface StockData {
@@ -106,6 +107,9 @@ export default function StockDashboard({ stocks, selectedQuarter }: StockDashboa
         y: 0,
         stock: null
     });
+
+    // Pie chart hover state
+    const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
 
     // อัพเดท currentDate เมื่อ selectedQuarter เปลี่ยน
     useEffect(() => {
@@ -322,6 +326,34 @@ export default function StockDashboard({ stocks, selectedQuarter }: StockDashboa
       });
   }, [monthlyStocks, currentMonthIndex, currentYear]);
 
+  // คำนวณจำนวนหุ้นในแต่ละหมวดหมู่สำหรับ Donut Chart
+  const categoryData = useMemo(() => {
+    const categoryCount: Record<string, number> = {};
+
+    // นับจำนวนหุ้นในแต่ละหมวดหมู่
+    dashboardTableData.forEach((stock) => {
+      const category = stock.cat;
+      categoryCount[category] = (categoryCount[category] || 0) + 1;
+    });
+
+    // แปลงเป็น array และเรียงตามจำนวนมากไปน้อย
+    const categories = Object.entries(categoryCount)
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count);
+
+    // คำนวณเปอร์เซ็นต์
+    const total = categories.reduce((sum, cat) => sum + cat.count, 0);
+
+    // กำหนดสีให้แต่ละหมวดหมู่
+    const colors = ['#1E40AF', '#2563EB', '#60A5FA', '#93C5FD', '#BFDBFE', '#DBEAFE'];
+
+    return categories.map((cat, index) => ({
+      ...cat,
+      percentage: total > 0 ? (cat.count / total) * 100 : 0,
+      color: colors[index % colors.length]
+    }));
+  }, [dashboardTableData]);
+
   return (
     <div className="w-full pb-12 mt-6"> 
       
@@ -497,28 +529,57 @@ export default function StockDashboard({ stocks, selectedQuarter }: StockDashboa
 
         {/* Donut Chart Section */}
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex flex-col items-center justify-center">
-             <div className="relative w-48 h-48">
-                <div className="w-full h-full rounded-full" 
-                    style={{ 
-                        background: `conic-gradient(
-                            #2563EB 0% 40%, 
-                            #60A5FA 40% 65%, 
-                            #93C5FD 65% 85%, 
-                            #1E40AF 85% 100%
-                        )`
-                    }}>
+             {categoryData.length === 0 ? (
+                <div className="text-center text-gray-400">
+                  <p className="text-sm">ไม่มีข้อมูลหมวดหมู่</p>
                 </div>
-                <div className="absolute inset-0 m-auto w-24 h-24 bg-white rounded-full flex items-center justify-center flex-col">
-                   <span></span>
-                </div>
-             </div>
+             ) : (
+                <>
+                  <div className="relative w-48 h-48">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={categoryData.map(cat => ({ name: cat.name, value: cat.count }))}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={48}
+                          outerRadius={96}
+                          dataKey="value"
+                          isAnimationActive={false}
+                          onMouseEnter={(_, index) => setHoveredCategory(categoryData[index].name)}
+                          onMouseLeave={() => setHoveredCategory(null)}
+                        >
+                          {categoryData.map((cat, index) => (
+                            <Cell
+                              key={`cell-${index}`}
+                              fill={cat.color}
+                              fillOpacity={hoveredCategory === null || hoveredCategory === cat.name ? 1 : 0.3}
+                              cursor="pointer"
+                            />
+                          ))}
+                        </Pie>
+                      </PieChart>
+                    </ResponsiveContainer>
+                    <div className="absolute inset-0 m-auto w-24 h-24 flex items-center justify-center flex-col pointer-events-none">
+                       <span className="text-2xl font-bold text-gray-900">{dashboardTableData.length}</span>
+                       <span className="text-xs text-gray-500">หุ้น</span>
+                    </div>
+                  </div>
 
-             <div className="flex flex-wrap gap-3 mt-8 justify-center text-xs text-gray-700">
-                <div className="flex items-center gap-1"><span className="w-3 h-3 bg-[#1E40AF]"></span> เทคโนโลยี</div>
-                <div className="flex items-center gap-1"><span className="w-3 h-3 bg-[#2563EB]"></span> พลังงาน</div>
-                <div className="flex items-center gap-1"><span className="w-3 h-3 bg-[#60A5FA]"></span> โรงแรม</div>
-                <div className="flex items-center gap-1"><span className="w-3 h-3 bg-[#93C5FD]"></span> ธนาคาร</div>
-             </div>
+                  <div className="flex flex-wrap gap-3 mt-8 justify-center text-xs text-gray-700">
+                    {categoryData.map((cat) => (
+                      <div
+                        key={cat.name}
+                        className="flex items-center gap-1"
+                        style={{ opacity: hoveredCategory === null || hoveredCategory === cat.name ? 1 : 0.3 }}
+                      >
+                        <span className="w-3 h-3 rounded-sm" style={{ backgroundColor: cat.color }}></span>
+                        <span>{cat.name} ({cat.count})</span>
+                      </div>
+                    ))}
+                  </div>
+                </>
+             )}
         </div>
       </div>
 

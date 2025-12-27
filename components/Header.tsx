@@ -24,7 +24,7 @@ export default function Header() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   
   // Search state
-  // const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   
   const searchRef = useRef<HTMLDivElement>(null);
 
@@ -35,9 +35,9 @@ export default function Header() {
         setIsOpen(false);
       }
       
-      // if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
-      //   setIsSearchOpen(false);
-      // }
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setIsSearchOpen(false);
+      }
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
@@ -75,7 +75,7 @@ export default function Header() {
         </div>
 
 
-        {/* <div className="flex flex-1 justify-end items-center mr-2" ref={searchRef}>          
+        <div className="flex flex-1 justify-end items-center mr-2" ref={searchRef}>          
           <div className="flex items-center gap-2">  
             {isSearchOpen && (
               <div className="relative w-full min-w-100 md:w-6"> 
@@ -107,7 +107,7 @@ export default function Header() {
               <Search className="w-5 h-5" />
             </button>
           </div>
-        </div> */}
+        </div>
 
         {/* Actions Section */}
         <div className="flex items-center gap-2 sm:gap-3">
