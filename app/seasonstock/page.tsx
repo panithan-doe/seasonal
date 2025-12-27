@@ -72,7 +72,7 @@ export default function SeasonStock() {
       
 
       <div className="min-h-screen bg-gray-50 p-6 md:p-12">
-        <section className="max-w-7xl mx-auto mb-16">
+        <section className="max-w-10/12 mx-auto mb-16">
           
           {/* Header */}
           <div className="flex justify-start items-end text-[#247AE0] mb-4">
